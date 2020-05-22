@@ -39,14 +39,18 @@ object Dependencies {
   }
 
   object Tapir {
-    private val version = "0.15.1"
+    private val version = "0.15.2"
 
-    val core         = "com.softwaremill.sttp.tapir" %% "tapir-core"          % version
-    val openApiCirce = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe" % version
-    val sttp         = "com.softwaremill.sttp.tapir" %% "tapir-sttp-client"   % version
-    val http4s       = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % version
+    val core            = "com.softwaremill.sttp.tapir" %% "tapir-core"              % version
+    val openApiCirce    = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe"     % version
+    val sttp            = "com.softwaremill.sttp.tapir" %% "tapir-sttp-client"       % version
+    val http4s          = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"     % version
+    val zio             = "com.softwaremill.sttp.tapir" %% "tapir-zio"               % version
+    val zioHttp4sServer = "com.softwaremill.sttp.tapir" %% "tapir-zio-http4s-server" % version
+    val circe           = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"        % version
+    val swagger         = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s" % version
 
-    val all: Seq[ModuleID] = Seq(core, openApiCirce, sttp, http4s)
+    val all: Seq[ModuleID] = Seq(core, openApiCirce, sttp, http4s, zio, zioHttp4sServer, circe, swagger)
 
   }
 
@@ -62,6 +66,17 @@ object Dependencies {
     val prometheusHtt4s = "io.chrisdavenport" %% "epimetheus-http4s"         % prometheusHtt4sV
 
     val all: Seq[ModuleID] = Seq(server, dsl, client, circe, prometheus, prometheusHtt4s)
+  }
+
+  object Doobie {
+    private val version = "0.9.0"
+
+    val core    = "org.tpolecat" %% "doobie-core"    % version
+    val h2      = "org.tpolecat" %% "doobie-h2"      % version
+    val refined = "org.tpolecat" %% "doobie-refined" % version
+
+    val all: Seq[ModuleID] = Seq(core, h2, refined)
+
   }
 
   object Circe {

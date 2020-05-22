@@ -52,6 +52,7 @@ lazy val dependencies =
       Streaming.all ++
       ZIO.all ++
       Tapir.all ++
+      Doobie.all ++
       Testing.all
 
 lazy val plugins = Seq(
