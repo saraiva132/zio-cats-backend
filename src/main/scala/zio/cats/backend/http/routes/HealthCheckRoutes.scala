@@ -1,15 +1,14 @@
-package zio.cats.backend.api
+package zio.cats.backend.http.routes
 
+import cats.implicits._
 import org.http4s.HttpRoutes
 import sttp.tapir.json.circe._
-import zio.cats.backend.services.healthcheck.Health._
-import zio.cats.backend.services.healthcheck.HealthCheck
-import zio.cats.backend.services.healthcheck._
-import zio.{IO, URIO, Task, UIO, ZIO}
-import sttp.tapir.ztapir._
 import sttp.tapir.server.http4s.ztapir._
-import cats.implicits._
+import sttp.tapir.ztapir._
+import zio.cats.backend.services.healthcheck.Health._
+import zio.cats.backend.services.healthcheck.{HealthCheck, _}
 import zio.interop.catz._
+import zio._
 
 final class HealthCheckRoutes {
 

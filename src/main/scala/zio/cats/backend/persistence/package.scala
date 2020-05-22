@@ -3,6 +3,9 @@ package zio.cats.backend
 import zio.{Has, Task}
 
 package object persistence {
+
+  type Persistence[I, O] = Has[Persistence.Service[I, O]]
+
   object Persistence {
     trait Service[I, O] {
       def get(i: I): Task[O]
@@ -10,7 +13,5 @@ package object persistence {
       def delete(i: I): Task[Boolean]
     }
   }
-
-  type Persistence[I,O] = Has[Persistence.Service[I, O]]
 
 }

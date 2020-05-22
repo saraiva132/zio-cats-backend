@@ -1,4 +1,4 @@
-package zio.cats.backend.config
+package zio.cats.backend.system.config
 
 import scala.concurrent.duration._
 

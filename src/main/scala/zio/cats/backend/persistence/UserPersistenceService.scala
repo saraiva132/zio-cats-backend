@@ -1,17 +1,14 @@
 package zio.cats.backend.persistence
 
-import cats.effect.Blocker
-import doobie.h2.H2Transactor
 import doobie.implicits._
-import doobie.{Query0, Transactor, Update0}
+import doobie.{Query0, Update0}
 import doobie.refined.implicits._
-import scala.concurrent.ExecutionContext
+import doobie.util.transactor.Transactor
 import zio._
-import zio.blocking.Blocking
-import zio.cats.backend.Models.{User, UserId, UserNotFound}
-import zio.cats.backend.config
-import zio.cats.backend.config.PostgresConfig
+import zio.cats.backend.{User, UserId, UserNotFound}
 import zio.interop.catz._
+import zio.cats.backend.system.dbtransactor
+import zio.cats.backend.system.dbtransactor.DBTransactor
 
 /**
   * Persistence Module for production using Doobie
@@ -64,33 +61,9 @@ object UserPersistenceService {
       sql"""DELETE FROM USERS WHERE id = ${userId.value}""".update
   }
 
-  def makeTransactor(
-    conf: PostgresConfig,
-    connectEC: ExecutionContext,
-    transactEC: ExecutionContext
-  ): Managed[Throwable, UserPersistenceService] = {
-    import zio.interop.catz._
-
-    H2Transactor
-      .newH2Transactor[Task](
-        conf.url.value,
-        conf.user.value,
-        conf.password.value,
-        connectEC,
-        Blocker.liftExecutionContext(transactEC)
-      )
-      .toManagedZIO
-      .map(new UserPersistenceService(_))
-  }
-
-  val live: ZLayer[Has[PostgresConfig] with Blocking, Throwable, UserPersistence] =
-    ZLayer.fromManaged(
-      for {
-        config     <- config.dbConfig.toManaged_
-        connectEC  <- ZIO.descriptor.map(_.executor.asEC).toManaged_
-        blockingEC <- blocking.blocking(ZIO.descriptor.map(_.executor.asEC)).toManaged_
-        managed    <- makeTransactor(config, connectEC, blockingEC)
-      } yield managed
+  val live: ZLayer[DBTransactor, Throwable, UserPersistence] =
+    ZLayer.fromEffect(
+      dbtransactor.transactor.map(new UserPersistenceService(_))
     )
 
 }
