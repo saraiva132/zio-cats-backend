@@ -8,7 +8,7 @@ package object persistence {
 
   object Persistence {
     trait Service[I, O] {
-      def get(i: I): Task[O]
+      def retrieve(i: I): Task[Option[O]]
       def create(a: O): Task[O]
       def delete(i: I): Task[Boolean]
     }

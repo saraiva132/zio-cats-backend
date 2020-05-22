@@ -1,4 +1,3 @@
-import Dependencies.Streaming.{core, io, reactive}
 import sbt._
 
 object Dependencies {
@@ -54,6 +53,17 @@ object Dependencies {
 
   }
 
+  object STTP {
+
+    private val version = "2.1.4"
+
+    val zioClient   = "com.softwaremill.sttp.client" %% "async-http-client-backend-zio" % version
+    val clientCirce = "com.softwaremill.sttp.client" %% "circe"                         % version
+
+    val all: Seq[ModuleID] = Seq(zioClient, clientCirce)
+
+  }
+
   object Http4s {
     private val version          = "0.21.4"
     private val prometheusHtt4sV = "0.4.0"
@@ -86,9 +96,10 @@ object Dependencies {
     val core             = "io.circe" %% "circe-core"           % version
     val generic          = "io.circe" %% "circe-generic"        % version
     val parser           = "io.circe" %% "circe-parser"         % version
+    val refined          = "io.circe" %% "circe-refined"        % version
     val `generic-extras` = "io.circe" %% "circe-generic-extras" % versionExtras
 
-    val all: Seq[ModuleID] = Seq(core, generic, parser, `generic-extras`)
+    val all: Seq[ModuleID] = Seq(core, generic, parser, refined, `generic-extras`)
   }
 
   object Streaming {

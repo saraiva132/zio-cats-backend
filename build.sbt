@@ -53,6 +53,8 @@ lazy val dependencies =
       Tapir.all ++
       Doobie.all ++
       Enum.all ++
+      STTP.all ++
+      Circe.all ++
       Testing.all
 
 lazy val plugins = Seq(

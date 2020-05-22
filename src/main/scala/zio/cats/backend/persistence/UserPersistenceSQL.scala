@@ -5,7 +5,7 @@ import doobie.{Query0, Update0}
 import doobie.refined.implicits._
 import doobie.util.transactor.Transactor
 import zio._
-import zio.cats.backend.{User, UserId, UserNotFound}
+import zio.cats.backend.data.{User, UserId}
 import zio.interop.catz._
 import zio.cats.backend.system.dbtransactor
 import zio.cats.backend.system.dbtransactor.DBTransactor
@@ -13,18 +13,14 @@ import zio.cats.backend.system.dbtransactor.DBTransactor
 /**
   * Persistence Module for production using Doobie
   */
-final class UserPersistenceService(tnx: Transactor[Task]) extends Persistence.Service[UserId, User] {
-  import UserPersistenceService._
+final class UserPersistenceSQL(tnx: Transactor[Task]) extends Persistence.Service[UserId, User] {
+  import UserPersistenceSQL._
 
-  def get(userId: UserId): Task[User] =
+  def retrieve(userId: UserId): Task[Option[User]] =
     Queries
       .get(userId)
       .option
       .transact(tnx)
-      .foldM(
-        err => Task.fail(err),
-        maybeUser => Task.require(UserNotFound(userId))(Task.succeed(maybeUser))
-      )
 
   def create(user: User): Task[User] =
     Queries
@@ -41,13 +37,13 @@ final class UserPersistenceService(tnx: Transactor[Task]) extends Persistence.Se
       .fold(_ => false, _ => true)
 }
 
-object UserPersistenceService {
+object UserPersistenceSQL {
 
   type UserPersistence = Persistence[UserId, User]
 
-  def getUser(userId: UserId): RIO[UserPersistence, User]       = RIO.accessM(_.get.get(userId))
-  def createUser(user: User): RIO[UserPersistence, User]        = RIO.accessM(_.get.create(user))
-  def deleteUser(userId: UserId): RIO[UserPersistence, Boolean] = RIO.accessM(_.get.delete(userId))
+  def retrieve(userId: UserId): RIO[UserPersistence, Option[User]] = RIO.accessM(_.get.retrieve(userId))
+  def create(user: User): RIO[UserPersistence, User]               = RIO.accessM(_.get.create(user))
+  def delete(userId: UserId): RIO[UserPersistence, Boolean]        = RIO.accessM(_.get.delete(userId))
 
   object Queries {
 
@@ -63,7 +59,7 @@ object UserPersistenceService {
 
   val live: ZLayer[DBTransactor, Throwable, UserPersistence] =
     ZLayer.fromEffect(
-      dbtransactor.transactor.map(new UserPersistenceService(_))
+      dbtransactor.transactor.map(new UserPersistenceSQL(_))
     )
 
 }

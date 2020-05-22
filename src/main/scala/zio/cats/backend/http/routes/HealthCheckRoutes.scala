@@ -13,10 +13,10 @@ import zio._
 final class HealthCheckRoutes {
 
   private val healthCheck: ZIO[HealthCheck, String, String] =
-    healthStatus.orElseFail("FAILURE").collectM("FAILURE") {
+    healthStatus.orElseFail("Internal failure.").flatMap {
       case Healthy      => UIO.succeed("Healthy!")
-      case Unhealthy    => IO.fail("FAILURE")
-      case ShuttingDown => IO.fail("SHUTTING DOWN")
+      case Unhealthy    => IO.fail("Unhealthy")
+      case ShuttingDown => IO.fail("Shutting Down")
     }
 
   private val aliveEndpoint: ZEndpoint[Unit, String, String] =
