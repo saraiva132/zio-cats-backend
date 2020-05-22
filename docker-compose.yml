@@ -1,0 +1,9 @@
+version: '3'
+services:
+
+  postgres:
+    image: postgres:12.3
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=test123
+      - POSTGRES_DB=user

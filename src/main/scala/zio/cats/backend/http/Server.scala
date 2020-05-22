@@ -14,14 +14,20 @@ import zio.clock.Clock
 import zio.interop.catz.implicits._
 import zio.interop.catz._
 import cats.implicits._
+import sttp.tapir.openapi.circe.yaml._
+import sttp.tapir.swagger.http4s.SwaggerHttp4s
 
 final class Server() extends Http4sDsl[Task[*]] {
 
+  val userRoutes = new UserRoutes()
+  val userDocs   = userRoutes.docs.toYaml
+
   val api: URIO[AppEnv, HttpApp[Task]] =
     for {
-      userRoutes        <- new UserRoutes().routes
+      userRoutes        <- userRoutes.routes
       healthCheckRoutes <- new HealthCheckRoutes().routes
-    } yield (userRoutes <+> healthCheckRoutes).orNotFound
+      docsRoutes         = new SwaggerHttp4s(userDocs).routes[Task]
+    } yield (userRoutes <+> healthCheckRoutes <+> docsRoutes).orNotFound
 }
 
 object Server {

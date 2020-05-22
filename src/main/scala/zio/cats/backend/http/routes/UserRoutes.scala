@@ -16,6 +16,7 @@ import zio.cats.backend.services.user
 import zio.cats.backend.services.user.UserManager
 import zio.interop.catz._
 import cats.implicits._
+import sttp.tapir.docs.openapi._
 
 final class UserRoutes {
 
@@ -42,6 +43,8 @@ final class UserRoutes {
     getUserRoute    <- getUserRoute
     deleteUserRoute <- deleteUserRoute
   } yield postUserRoute <+> getUserRoute <+> deleteUserRoute
+
+  val docs = List(postUser, getUser, deleteUser).toOpenAPI("User manager", "0.1")
 
 }
 

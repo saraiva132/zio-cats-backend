@@ -40,16 +40,18 @@ object Dependencies {
   object Tapir {
     private val version = "0.15.2"
 
-    val core            = "com.softwaremill.sttp.tapir" %% "tapir-core"              % version
-    val openApiCirce    = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe"     % version
-    val sttp            = "com.softwaremill.sttp.tapir" %% "tapir-sttp-client"       % version
-    val http4s          = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"     % version
-    val zio             = "com.softwaremill.sttp.tapir" %% "tapir-zio"               % version
-    val zioHttp4sServer = "com.softwaremill.sttp.tapir" %% "tapir-zio-http4s-server" % version
-    val circe           = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"        % version
-    val swagger         = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s" % version
+    val core             = "com.softwaremill.sttp.tapir" %% "tapir-core"               % version
+    val docs             = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs"       % version
+    val openApiCirce     = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe"      % version
+    val openApiCirceYaml = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % version
+    val sttp             = "com.softwaremill.sttp.tapir" %% "tapir-sttp-client"        % version
+    val http4s           = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"      % version
+    val zio              = "com.softwaremill.sttp.tapir" %% "tapir-zio"                % version
+    val zioHttp4sServer  = "com.softwaremill.sttp.tapir" %% "tapir-zio-http4s-server"  % version
+    val circe            = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"         % version
+    val swagger          = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s"  % version
 
-    val all: Seq[ModuleID] = Seq(core, openApiCirce, sttp, http4s, zio, zioHttp4sServer, circe, swagger)
+    val all: Seq[ModuleID] = Seq(core, docs, openApiCirce, openApiCirceYaml, sttp, http4s, zio, zioHttp4sServer, circe, swagger)
 
   }
 
