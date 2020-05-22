@@ -1,3 +1,4 @@
+import Dependencies.Streaming.{core, io, reactive}
 import sbt._
 
 object Dependencies {
@@ -11,13 +12,12 @@ object Dependencies {
     val logging        = "0.2.9"
 
     val zio             = "dev.zio" %% "zio"               % zioVersion
-    val zioDelegate     = "dev.zio" %% "zio-macros-core"   % macrosVersion
     val zioStream       = "dev.zio" %% "zio-streams"       % zioVersion
     val zioCatsInterop  = "dev.zio" %% "zio-interop-cats"  % interopVersion
     val zioLogging      = "dev.zio" %% "zio-logging"       % logging
     val zioLoggingSlf4j = "dev.zio" %% "zio-logging-slf4j" % logging
 
-    val all: Seq[ModuleID] = Seq(zio, zioStream, zioCatsInterop, zioDelegate, zioLogging, zioLoggingSlf4j)
+    val all: Seq[ModuleID] = Seq(zio, zioStream, zioCatsInterop, zioLogging, zioLoggingSlf4j)
   }
 
   object Cats {
@@ -102,7 +102,13 @@ object Dependencies {
   }
 
   object Enum {
-    val enumeratum = "com.beachape" %% "enumeratum-circe" % "1.6.1"
+    private val version = "1.6.1"
+
+    val core  = "com.beachape" %% "enumeratum"       % version
+    val circe = "com.beachape" %% "enumeratum-circe" % version
+
+    val all: Seq[ModuleID] = Seq(core, circe)
+
   }
 
   object Config {

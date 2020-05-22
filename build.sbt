@@ -24,10 +24,10 @@ lazy val zioCatsBackend = project
 lazy val thisBuildSettings = inThisBuild(
   Seq(
     scalaVersion := "2.13.1",
-    name := "horizon",
+    name := "zio-cats-backend",
     normalizedName := "zio-cats-backend",
     description := "A backend service integrating ZIO with cats, http4s, doobie and tapir",
-    startYear := Some(2019),
+    startYear := Some(2020),
     Compile / packageDoc / publishArtifact := false,
     packageDoc / publishArtifact := false,
     publish / skip := true,
@@ -45,14 +45,14 @@ lazy val thisBuildSettings = inThisBuild(
 )
 
 lazy val dependencies =
-  Seq(Enum.enumeratum) ++
-      Cats.all ++
+  Cats.all ++
       Http4s.all ++
       Config.all ++
       Streaming.all ++
       ZIO.all ++
       Tapir.all ++
       Doobie.all ++
+      Enum.all ++
       Testing.all
 
 lazy val plugins = Seq(
