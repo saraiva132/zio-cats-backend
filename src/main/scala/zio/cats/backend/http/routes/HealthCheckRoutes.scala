@@ -9,10 +9,11 @@ import zio.cats.backend.services.healthcheck.Health._
 import zio.cats.backend.services.healthcheck.{HealthCheck, _}
 import zio.interop.catz._
 import zio._
+import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
 
 final class HealthCheckRoutes {
 
-  private val healthCheck: ZIO[HealthCheck, String, String] =
+  private val healthCheck: ZIO[HealthCheck with UserPersistence, String, String] =
     healthStatus.orElseFail("Internal failure.").flatMap {
       case Healthy      => UIO.succeed("Healthy!")
       case Unhealthy    => IO.fail("Unhealthy")
@@ -25,10 +26,10 @@ final class HealthCheckRoutes {
   private val readyEndpoint: ZEndpoint[Unit, String, String] =
     endpoint.get.in("health" / "ready").errorOut(stringBody).out(jsonBody[String])
 
-  private val aliveRoute: URIO[HealthCheck, HttpRoutes[Task]] = aliveEndpoint.toRoutesR(_ => healthCheck)
-  private val readyRoute: URIO[HealthCheck, HttpRoutes[Task]] = readyEndpoint.toRoutesR(_ => healthCheck)
+  private val aliveRoute: URIO[HealthCheck with UserPersistence, HttpRoutes[Task]] = aliveEndpoint.toRoutesR(_ => healthCheck)
+  private val readyRoute: URIO[HealthCheck with UserPersistence, HttpRoutes[Task]] = readyEndpoint.toRoutesR(_ => healthCheck)
 
-  val routes: URIO[HealthCheck, HttpRoutes[Task]] = for {
+  val routes: URIO[HealthCheck with UserPersistence, HttpRoutes[Task]] = for {
     aliveRoute <- aliveRoute
     readyRoute <- readyRoute
   } yield aliveRoute <+> readyRoute

@@ -122,6 +122,10 @@ object Dependencies {
 
   }
 
+  object Flyway {
+    val core = "org.flywaydb" % "flyway-core" % "6.4.2"
+  }
+
   object Config {
     private val version  = "0.12.3"
     private val refinedV = "0.9.14"

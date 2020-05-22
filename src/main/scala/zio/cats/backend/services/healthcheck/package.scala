@@ -1,7 +1,9 @@
 package zio.cats.backend.services
 
-import zio.cats.backend.services.healthcheck.Health.Healthy
-import zio.{Has, Layer, RIO, Task, UIO, ZLayer}
+import zio.cats.backend.services.healthcheck.Health.{Healthy, Unhealthy}
+import zio.{Has, RIO, ULayer, ZLayer}
+import zio.cats.backend.persistence.UserPersistenceSQL
+import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
 
 package object healthcheck {
 
@@ -9,13 +11,20 @@ package object healthcheck {
 
   object HealthCheck {
     trait Service {
-      def healthStatus: Task[Health]
+      def healthStatus: RIO[UserPersistence, Health]
     }
-    val live: Layer[Nothing, HealthCheck] = ZLayer.succeed(new HealthCheck.Service {
-      override def healthStatus: Task[Health] = UIO.succeed(Healthy)
-    })
+
+    val live: ULayer[HealthCheck] = ZLayer.succeed(
+      new Service {
+        override def healthStatus: RIO[UserPersistence, Health] =
+          UserPersistenceSQL.isHealthy.map {
+            case true  => Healthy
+            case false => Unhealthy
+          }
+      }
+    )
   }
 
-  val healthStatus: RIO[HealthCheck, Health] = RIO.accessM(_.get.healthStatus)
+  val healthStatus: RIO[HealthCheck with UserPersistence, Health] = RIO.accessM(_.get.healthStatus)
 
 }

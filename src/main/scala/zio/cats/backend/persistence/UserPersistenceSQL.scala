@@ -35,6 +35,11 @@ final class UserPersistenceSQL(tnx: Transactor[Task]) extends Persistence.Servic
       .run
       .transact(tnx)
       .fold(_ => false, _ => true)
+
+  def isHealthy: Task[Boolean] =
+    Queries.health.unique
+      .transact(tnx)
+      .fold(_ => false, _ => true)
 }
 
 object UserPersistenceSQL {
@@ -44,6 +49,7 @@ object UserPersistenceSQL {
   def retrieve(userId: UserId): RIO[UserPersistence, Option[User]] = RIO.accessM(_.get.retrieve(userId))
   def create(user: User): RIO[UserPersistence, User]               = RIO.accessM(_.get.create(user))
   def delete(userId: UserId): RIO[UserPersistence, Boolean]        = RIO.accessM(_.get.delete(userId))
+  def isHealthy: RIO[UserPersistence, Boolean]                     = RIO.accessM(_.get.isHealthy)
 
   object Queries {
 
@@ -55,6 +61,9 @@ object UserPersistenceSQL {
 
     def delete(userId: UserId): Update0 =
       sql"""DELETE FROM USERS WHERE id = ${userId.value}""".update
+
+    val health: Query0[Unit] = sql"""SELECT 1 as one;""".query[Unit]
+
   }
 
   val live: ZLayer[DBTransactor, Throwable, UserPersistence] =

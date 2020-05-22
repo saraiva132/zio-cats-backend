@@ -17,13 +17,10 @@ import cats.implicits._
 
 final class Server() extends Http4sDsl[Task[*]] {
 
-  val healthCheckRoutes = new HealthCheckRoutes().routes
-  val userRoutes        = new UserRoutes().routes
-
   val api: URIO[AppEnv, HttpApp[Task]] =
     for {
-      userRoutes        <- userRoutes
-      healthCheckRoutes <- healthCheckRoutes
+      userRoutes        <- new UserRoutes().routes
+      healthCheckRoutes <- new HealthCheckRoutes().routes
     } yield (userRoutes <+> healthCheckRoutes).orNotFound
 }
 

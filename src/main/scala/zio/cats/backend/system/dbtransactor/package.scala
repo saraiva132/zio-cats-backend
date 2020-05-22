@@ -32,6 +32,7 @@ package object dbtransactor {
     val live: ZLayer[Has[PostgresConfig] with Blocking, Throwable, DBTransactor] =
       ZLayer.fromManaged(
         for {
+          _          <- Migration.migrate.toManaged_
           config     <- config.dbConfig.toManaged_
           connectEC  <- ZIO.descriptor.map(_.executor.asEC).toManaged_
           blockingEC <- blocking.blocking(ZIO.descriptor.map(_.executor.asEC)).toManaged_

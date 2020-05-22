@@ -11,6 +11,7 @@ package object persistence {
       def retrieve(i: I): Task[Option[O]]
       def create(a: O): Task[O]
       def delete(i: I): Task[Boolean]
+      def isHealthy : Task[Boolean]
     }
   }
 
