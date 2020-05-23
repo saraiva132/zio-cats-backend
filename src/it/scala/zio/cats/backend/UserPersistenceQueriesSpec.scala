@@ -11,7 +11,7 @@ import zio.cats.backend.data.{User, UserId}
 import zio.cats.backend.system.config.Config
 import zio.cats.backend.system.logging.Logger
 
-object QueriesSpec extends DefaultRunnableSpec with ZIOChecker {
+object UserPersistenceQueriesSpec extends DefaultRunnableSpec with ZIOChecker {
 
   val runtime     = Runtime.default //Use test runtime
   val releaseMap  = runtime.unsafeRun(ReleaseMap.make)

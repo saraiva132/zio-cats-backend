@@ -8,44 +8,44 @@ import zio.{Has, RIO, Task, UIO, ULayer, ZLayer}
 
 package object user {
 
-  type UserManager = Has[UserManager.Service]
+  type UserService = Has[UserService.Service]
 
-  object UserManager {
+  object UserService {
     trait Service {
-      def registerUser(postUser: PostUser): RIO[UserPersistence with ReqRes, Unit]
+      def createUser(postUser: PostUser): RIO[UserPersistence with ReqRes, Unit]
       def getUser(userId: UserId): RIO[UserPersistence, User]
       def deleteUser(userId: UserId): RIO[UserPersistence, Unit]
     }
 
-    val live: ULayer[UserManager] =
+    val live: ULayer[UserService] =
       ZLayer.succeed(
-        new UserManager.Service {
-          override def registerUser(postUser: PostUser): RIO[UserPersistence with ReqRes, Unit] =
+        new UserService.Service {
+          override def createUser(postUser: PostUser): RIO[UserPersistence with ReqRes, Unit] =
             for {
-              user <- fetchUser(postUser.userId)
-              _    <- create(user)
+              user <- ReqRes.fetchUser(postUser.userId)
+              _    <- UserPersistence.create(user)
             } yield ()
 
           override def getUser(userId: UserId): RIO[UserPersistence, User] =
-            retrieve(userId)
+            UserPersistence
+              .retrieve(userId)
               .flatMap(maybeUser => Task.require(UserNotFound(userId))(Task.succeed(maybeUser)))
 
           override def deleteUser(userId: UserId): RIO[UserPersistence, Unit] =
-            delete(userId).flatMap {
+            UserPersistence.delete(userId).flatMap {
               case true  => UIO.unit
               case false => Task.fail(UserNotFound(userId))
             }
         }
       )
+
+    def registerUser(postUser: PostUser): RIO[UserService with ReqRes with UserPersistence with ReqRes, Unit] =
+      RIO.accessM(_.get.createUser(postUser))
+
+    def getUser(userId: UserId): RIO[UserService with UserPersistence, User] =
+      RIO.accessM(_.get.getUser(userId))
+
+    def deleteUser(userId: UserId): RIO[UserService with UserPersistence, Unit] =
+      RIO.accessM(_.get.deleteUser(userId))
   }
-
-  def registerUser(postUser: PostUser): RIO[UserManager with UserPersistence with ReqRes, Unit] =
-    RIO.accessM(_.get.registerUser(postUser))
-
-  def getUser(userId: UserId): RIO[UserManager with UserPersistence, User] =
-    RIO.accessM(_.get.getUser(userId))
-
-  def deleteUser(userId: UserId): RIO[UserManager with UserPersistence, Unit] =
-    RIO.accessM(_.get.deleteUser(userId))
-
 }

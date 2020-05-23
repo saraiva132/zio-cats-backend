@@ -1,13 +1,12 @@
 package zio.cats.backend
 
 import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
-
 import zio.blocking.Blocking
 import zio.cats.backend.http.Server
-import zio.cats.backend.persistence.UserPersistenceSQL
+import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
 import zio.cats.backend.services.healthcheck.HealthCheck
 import zio.cats.backend.services.reqres.ReqResClient
-import zio.cats.backend.services.user.UserManager
+import zio.cats.backend.services.user.UserService
 import zio.cats.backend.system.config.Config
 import zio.cats.backend.system.dbtransactor.DBTransactor
 import zio.cats.backend.system.logging.Logger
@@ -18,9 +17,9 @@ object Main extends App {
 
   val configLayer          = Logger.live >>> Config.live
   val transactorLayer      = Logger.live ++ Blocking.live ++ configLayer >>> DBTransactor.live
-  val userPersistenceLayer = transactorLayer >>> UserPersistenceSQL.live
+  val userPersistenceLayer = transactorLayer >>> UserPersistence.live
   val resreqClientLayer    = configLayer ++ AsyncHttpClientZioBackend.layer() >>> ReqResClient.live
-  val userManagerLayer     = UserManager.live
+  val userManagerLayer     = UserService.live
 
   val appLayers = Logger.live ++ configLayer ++ HealthCheck.live ++ userPersistenceLayer ++ resreqClientLayer ++ userManagerLayer
 

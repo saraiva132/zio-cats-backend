@@ -40,11 +40,10 @@ package object config {
         .map(c => Has(c.httpServer) ++ Has(c.httpClient) ++ Has(c.dbConfig) ++ Has(c.reqResClient))
         .tapError(logEnv)
     )
+
+    val httpServerConfig: URIO[Has[HttpServerConfig], HttpServerConfig] = ZIO.access(_.get)
+    val httpClientConfig: URIO[Has[HttpClientConfig], HttpClientConfig] = ZIO.access(_.get)
+    val dbConfig: URIO[Has[PostgresConfig], PostgresConfig]             = ZIO.access(_.get)
+    val reqResConfig: URIO[Has[ReqResConfig], ReqResConfig]             = ZIO.access(_.get)
   }
-
-  val httpServerConfig: URIO[Has[HttpServerConfig], HttpServerConfig] = ZIO.access(_.get)
-  val httpClientConfig: URIO[Has[HttpClientConfig], HttpClientConfig] = ZIO.access(_.get)
-  val dbConfig: URIO[Has[PostgresConfig], PostgresConfig]             = ZIO.access(_.get)
-  val reqResConfig: URIO[Has[ReqResConfig], ReqResConfig]             = ZIO.access(_.get)
-
 }

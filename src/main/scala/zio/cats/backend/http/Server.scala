@@ -9,7 +9,7 @@ import sttp.tapir.openapi.circe.yaml._
 import sttp.tapir.swagger.http4s.SwaggerHttp4s
 import zio.cats.backend.{AppEnv, ServiceEnv}
 import zio.cats.backend.http.routes.{HealthCheckRoutes, UserRoutes}
-import zio.cats.backend.system.config
+import zio.cats.backend.system.config.Config
 import zio.clock.Clock
 import zio.interop.catz._
 import zio.interop.catz.implicits._
@@ -32,7 +32,7 @@ object Server {
   val runServer: ZIO[AppEnv, Throwable, Unit] =
     for {
       api                          <- new Server().api
-      svConfig                     <- config.httpServerConfig
+      svConfig                     <- Config.httpServerConfig
       implicit0(r: Runtime[Clock]) <- ZIO.runtime[Clock]
       bec                          <- blocking.blocking(ZIO.descriptor.map(_.executor.asEC))
       _ <-

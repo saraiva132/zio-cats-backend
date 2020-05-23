@@ -10,7 +10,8 @@ package object reqres {
     trait Service {
       def fetchUser(userId: UserId): Task[User]
     }
+
+    def fetchUser(userId: UserId): RIO[ReqRes, User] = RIO.accessM(_.get.fetchUser(userId))
   }
 
-  def fetchUser(userId: UserId): RIO[ReqRes, User] = RIO.accessM(_.get.fetchUser(userId))
 }

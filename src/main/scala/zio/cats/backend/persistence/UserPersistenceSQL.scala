@@ -7,7 +7,6 @@ import doobie.{Query0, Update0}
 
 import zio._
 import zio.cats.backend.data.{User, UserId}
-import zio.cats.backend.system.dbtransactor
 import zio.cats.backend.system.dbtransactor.DBTransactor
 import zio.interop.catz._
 
@@ -47,13 +46,19 @@ object UserPersistenceSQL {
 
   type UserPersistence = Persistence[UserId, User]
 
-  def retrieve(userId: UserId): RIO[UserPersistence, Option[User]] = RIO.accessM(_.get.retrieve(userId))
-  def create(user: User): RIO[UserPersistence, User]               = RIO.accessM(_.get.create(user))
-  def delete(userId: UserId): RIO[UserPersistence, Boolean]        = RIO.accessM(_.get.delete(userId))
-  def isHealthy: RIO[UserPersistence, Boolean]                     = RIO.accessM(_.get.isHealthy)
+  object UserPersistence {
+    val live: ZLayer[DBTransactor, Throwable, UserPersistence] =
+      ZLayer.fromEffect(
+        DBTransactor.transactor.map(new UserPersistenceSQL(_))
+      )
+
+    def retrieve(userId: UserId): RIO[UserPersistence, Option[User]] = RIO.accessM(_.get.retrieve(userId))
+    def create(user: User): RIO[UserPersistence, User]               = RIO.accessM(_.get.create(user))
+    def delete(userId: UserId): RIO[UserPersistence, Boolean]        = RIO.accessM(_.get.delete(userId))
+    def isHealthy: RIO[UserPersistence, Boolean]                     = RIO.accessM(_.get.isHealthy)
+  }
 
   object Queries {
-
     def get(userId: UserId): Query0[User] =
       sql"""SELECT * FROM USERS WHERE ID = ${userId.value} """.query[User]
 
@@ -66,10 +71,5 @@ object UserPersistenceSQL {
     val health: Query0[Unit] = sql"""SELECT 1 as one;""".query[Unit]
 
   }
-
-  val live: ZLayer[DBTransactor, Throwable, UserPersistence] =
-    ZLayer.fromEffect(
-      dbtransactor.transactor.map(new UserPersistenceSQL(_))
-    )
 
 }

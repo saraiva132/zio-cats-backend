@@ -1,6 +1,5 @@
 package zio.cats.backend.services
 
-import zio.cats.backend.persistence.UserPersistenceSQL
 import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
 import zio.cats.backend.services.healthcheck.Health.{Healthy, Unhealthy}
 import zio.{Has, RIO, ULayer, ZLayer}
@@ -17,14 +16,14 @@ package object healthcheck {
     val live: ULayer[HealthCheck] = ZLayer.succeed(
       new Service {
         override def healthStatus: RIO[UserPersistence, Health] =
-          UserPersistenceSQL.isHealthy.map {
+          UserPersistence.isHealthy.map {
             case true  => Healthy
             case false => Unhealthy
           }
       }
     )
-  }
+    val healthStatus: RIO[HealthCheck with UserPersistence, Health] = RIO.accessM(_.get.healthStatus)
 
-  val healthStatus: RIO[HealthCheck with UserPersistence, Health] = RIO.accessM(_.get.healthStatus)
+  }
 
 }

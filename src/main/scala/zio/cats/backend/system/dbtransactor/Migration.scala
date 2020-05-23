@@ -14,7 +14,7 @@ object Migration {
   private val fsLocation = new Location("filesystem:db/migration")
 
   val migrate: RIO[Has[PostgresConfig] with Logging, Unit] =
-    dbConfig
+    Config.dbConfig
       .flatMap { cfg =>
         ZIO.effect {
           val config = new ClassicConfiguration()

@@ -10,13 +10,13 @@ import sttp.tapir.ztapir._
 import zio._
 import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
 import zio.cats.backend.services.healthcheck.Health._
-import zio.cats.backend.services.healthcheck.{HealthCheck, _}
+import zio.cats.backend.services.healthcheck.HealthCheck
 import zio.interop.catz._
 
 final class HealthCheckRoutes {
 
   private val healthCheck: ZIO[HealthCheck with UserPersistence, String, String] =
-    healthStatus.orElseFail("Internal failure.").flatMap {
+    HealthCheck.healthStatus.orElseFail("Internal failure.").flatMap {
       case Healthy      => UIO.succeed("Healthy!")
       case Unhealthy    => IO.fail("Unhealthy")
       case ShuttingDown => IO.fail("Shutting Down")
