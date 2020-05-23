@@ -7,3 +7,5 @@ services:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=test123
       - POSTGRES_DB=user
+    ports:
+      - 5432:5432

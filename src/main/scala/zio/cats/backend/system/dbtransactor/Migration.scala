@@ -5,18 +5,24 @@ import org.flywaydb.core.api.Location
 import org.flywaydb.core.api.configuration.ClassicConfiguration
 import zio.{Has, RIO, ZIO}
 import zio.cats.backend.system.config._
+import zio.logging.{Logging, log}
 
 object Migration {
 
-  val migrate: RIO[Has[PostgresConfig], Unit] =
-    dbConfig.flatMap { cfg =>
-      ZIO.effect {
-        val config = new ClassicConfiguration()
-        config.setDataSource(cfg.url.value, cfg.user.value, cfg.password.value)
-        config.setLocations(new Location("classpath:db/migration"), new Location("filesystem:db/migration"))
-        val newFlyway = new Flyway(config)
-        newFlyway.migrate()
-      }.unit
-    }
+  private val cpLocation = new Location("classpath:db/migration")
+  private val fsLocation = new Location("filesystem:db/migration")
+
+  val migrate: RIO[Has[PostgresConfig] with Logging, Unit] =
+    dbConfig
+      .flatMap { cfg =>
+        ZIO.effect {
+          val config = new ClassicConfiguration()
+          config.setDataSource(cfg.url.value, cfg.user.value, cfg.password.value)
+          config.setLocations(cpLocation, fsLocation)
+          val newFlyway = new Flyway(config)
+          newFlyway.migrate()
+        }.unit
+      }
+      .tapError(err => log.error(s"Error migrating database $err."))
 
 }

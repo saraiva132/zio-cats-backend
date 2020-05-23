@@ -44,8 +44,8 @@ lazy val thisBuildSettings = inThisBuild(
   )
 )
 
-lazy val dependencies = Seq(Flyway.core) ++
-      Cats.all ++
+lazy val dependencies =
+  Cats.all ++
       Http4s.all ++
       Config.all ++
       Streaming.all ++
@@ -55,6 +55,8 @@ lazy val dependencies = Seq(Flyway.core) ++
       Enum.all ++
       STTP.all ++
       Circe.all ++
+      Logging.all ++
+      Flyway.all ++
       Testing.all
 
 lazy val plugins = Seq(

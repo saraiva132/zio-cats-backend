@@ -8,6 +8,7 @@ import zio.blocking.Blocking
 import zio.{Has, Managed, Task, URIO, ZIO, ZLayer, blocking}
 import zio.cats.backend.system.config.PostgresConfig
 import zio.interop.catz._
+import zio.logging.{Logging}
 
 package object dbtransactor {
 
@@ -29,7 +30,7 @@ package object dbtransactor {
         )
         .toManagedZIO
 
-    val live: ZLayer[Has[PostgresConfig] with Blocking, Throwable, DBTransactor] =
+    val live: ZLayer[Has[PostgresConfig] with Logging with Blocking, Throwable, DBTransactor] =
       ZLayer.fromManaged(
         for {
           _          <- Migration.migrate.toManaged_

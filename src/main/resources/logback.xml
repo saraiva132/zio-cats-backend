@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration scan="true" scanPeriod="10 seconds">
+
+    <property name="log-pattern"
+              value="%d %-5p [%t][%c] ip:%X{clientIp} s:%X{sessionId} c:%X{casinoId} p:%X{playerId} - %m%n"/>
+
+    <appender name="sync-console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${LOG_LEVEL:-debug}</level>
+        </filter>
+        <encoder>
+            <pattern>${log-pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="console" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="sync-console"/>
+    </appender>
+
+    <root level="${LOG_LEVEL:-debug}">
+        <appender-ref ref="${LOG_APPENDER:-console}"/>
+    </root>
+
+</configuration>

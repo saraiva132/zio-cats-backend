@@ -4,9 +4,10 @@ import sttp.client._
 import sttp.client.asynchttpclient.WebSocketHandler
 import sttp.client.asynchttpclient.zio.SttpClient
 import sttp.client.circe._
+import sttp.model.StatusCode
 import zio.cats.backend.system.config
 import zio.cats.backend.system.config.ReqResConfig
-import zio.cats.backend.data.Error.ErrorFetchingUser
+import zio.cats.backend.data.Error.{ErrorFetchingUser, UserNotFound}
 import zio.cats.backend.data.{User, UserId}
 import zio._
 import zio.cats.backend.services.reqres.reqres.ReqRes
@@ -23,6 +24,9 @@ final class ReqResClient(client: SttpBackend[Task, Nothing, WebSocketHandler], c
           .response(asJson[User])
           .get(uri"$endpoint/$path/${userId.value}")
       )
+      .reject {
+        case r if r.code == StatusCode.NotFound => UserNotFound(userId)
+      }
       .map(_.body)
       .flatMap(e => IO.fromEither(e).mapError(err => ErrorFetchingUser(userId, err.body)))
 

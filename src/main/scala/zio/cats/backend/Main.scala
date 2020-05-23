@@ -15,12 +15,13 @@ import zio.{App, UIO, ZEnv, ZIO}
 
 object Main extends App {
 
-  val transactorLayer      = Blocking.live ++ Config.live >>> DBTransactor.live
+  val configLayer          = Logger.live >>> Config.live
+  val transactorLayer      = Logger.live ++ Blocking.live ++ configLayer >>> DBTransactor.live
   val userPersistenceLayer = transactorLayer >>> UserPersistenceSQL.live
-  val resreqClientLayer    = Config.live ++ AsyncHttpClientZioBackend.layer() >>> ReqResClient.live
+  val resreqClientLayer    = configLayer ++ AsyncHttpClientZioBackend.layer() >>> ReqResClient.live
   val userManagerLayer     = UserManager.live
 
-  val appLayers = Logger.live ++ Config.live ++ HealthCheck.live ++ userPersistenceLayer ++ resreqClientLayer ++ userManagerLayer
+  val appLayers = Logger.live ++ configLayer ++ HealthCheck.live ++ userPersistenceLayer ++ resreqClientLayer ++ userManagerLayer
 
   override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] =
     Server.runServer

@@ -4,5 +4,5 @@ final case class Configuration(
   httpServer: HttpServerConfig,
   httpClient: HttpClientConfig,
   dbConfig: PostgresConfig,
-  reqResConfig : ReqResConfig
+  reqResClient: ReqResConfig
 )

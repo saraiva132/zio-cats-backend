@@ -126,6 +126,10 @@ object Dependencies {
 
   object Flyway {
     val core = "org.flywaydb" % "flyway-core" % "6.4.2"
+    val driver = "org.postgresql" % "postgresql" % "42.2.12"
+
+    val all: Seq[ModuleID] = Seq(core, driver)
+
   }
 
   object Config {
@@ -136,6 +140,14 @@ object Dependencies {
     val pureconfigRefined = "eu.timepit"            %% "refined-pureconfig" % refinedV
 
     val all: Seq[ModuleID] = Seq(pureconfig, pureconfigRefined)
+  }
+
+  object Logging {
+    private val logbackV = "1.2.3"
+
+    val Core               = "ch.qos.logback" % "logback-core"    % logbackV
+    val Logback            = "ch.qos.logback" % "logback-classic" % logbackV
+    val all: Seq[ModuleID] = Seq(Core, Logback)
   }
 
   object Testing {

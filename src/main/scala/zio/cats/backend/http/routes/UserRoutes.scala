@@ -20,6 +20,7 @@ import sttp.tapir.docs.openapi._
 
 final class UserRoutes {
 
+  //API Definition
   private val postUser: ZEndpoint[PostUser, ClientError, Unit] =
     endpoint.post.in("users").in(jsonBody[PostUser]).errorOut(jsonBody[ClientError])
 
@@ -29,6 +30,7 @@ final class UserRoutes {
   private val deleteUser: ZEndpoint[String, ClientError, Unit] =
     endpoint.delete.in("users" / path[String]("email")).errorOut(jsonBody[ClientError])
 
+  //Route implementation
   private val postUserRoute: URIO[UserManager with UserPersistence with ReqRes, HttpRoutes[Task]] =
     postUser.toRoutesR(postUser => user.registerUser(postUser).mapError(err => ClientError(err.getMessage)))
 
