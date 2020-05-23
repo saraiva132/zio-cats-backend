@@ -7,4 +7,6 @@ final case class PostUser(userId: UserId, email: Email)
 
 object PostUser {
   implicit val codec: Codec[PostUser] = deriveCodec
+
+  val Test = PostUser(UserId.Test, Email.Test)
 }

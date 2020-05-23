@@ -18,8 +18,8 @@ object QueriesSpec extends DefaultRunnableSpec with ZIOChecker {
   val configLayer = Logger.test >>> Config.live ++ Blocking.live
   val finalLayer  = (configLayer ++ Logger.test).map(cfg => (cfg, releaseMap))
 
-  val transactorF         = DBTransactor.managed.zio.provideLayer(finalLayer)
-  implicit val transactor = runtime.unsafeRun(transactorF)._2
+  val transactorF = DBTransactor.managed.zio.provideLayer(finalLayer)
+  val transactor  = runtime.unsafeRun(transactorF)._2
 
   def spec =
     suite("Validate queries")(

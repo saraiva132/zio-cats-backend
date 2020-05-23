@@ -3,7 +3,7 @@
 <configuration scan="true" scanPeriod="10 seconds">
 
     <property name="log-pattern"
-              value="%d %-5p [%t][%c] ip:%X{clientIp} s:%X{sessionId} c:%X{casinoId} p:%X{playerId} - %m%n"/>
+              value="%d %-5p [%t][%c] - %m%n"/>
 
     <appender name="sync-console" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">

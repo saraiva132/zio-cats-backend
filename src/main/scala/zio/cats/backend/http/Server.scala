@@ -1,30 +1,26 @@
 package zio.cats.backend.http
 
 import cats.implicits._
-
 import org.http4s.HttpApp
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import sttp.tapir.openapi.circe.yaml._
 import sttp.tapir.swagger.http4s.SwaggerHttp4s
-
-import zio.blocking.Blocking
-import zio.cats.backend.AppEnv
+import zio.cats.backend.{AppEnv, ServiceEnv}
 import zio.cats.backend.http.routes.{HealthCheckRoutes, UserRoutes}
 import zio.cats.backend.system.config
-import zio.cats.backend.system.config.HttpServerConfig
 import zio.clock.Clock
 import zio.interop.catz._
 import zio.interop.catz.implicits._
-import zio.{Has, Runtime, Task, URIO, ZIO, blocking}
+import zio.{Runtime, Task, URIO, ZIO, blocking}
 
 final class Server() extends Http4sDsl[Task[*]] {
 
   val userRoutes = new UserRoutes()
   val userDocs   = userRoutes.docs.toYaml
 
-  val api: URIO[AppEnv, HttpApp[Task]] =
+  val api: URIO[ServiceEnv, HttpApp[Task]] =
     for {
       userRoutes        <- userRoutes.routes
       healthCheckRoutes <- new HealthCheckRoutes().routes
@@ -33,12 +29,12 @@ final class Server() extends Http4sDsl[Task[*]] {
 }
 
 object Server {
-  val runServer: ZIO[Has[HttpServerConfig] with AppEnv with Clock with Blocking, Throwable, Unit] =
+  val runServer: ZIO[AppEnv, Throwable, Unit] =
     for {
-      api                                <- new Server().api
-      svConfig                           <- config.httpServerConfig
-      implicit0(runtime: Runtime[Clock]) <- ZIO.runtime[Clock]
-      bec                                <- blocking.blocking(ZIO.descriptor.map(_.executor.asEC))
+      api                          <- new Server().api
+      svConfig                     <- config.httpServerConfig
+      implicit0(r: Runtime[Clock]) <- ZIO.runtime[Clock]
+      bec                          <- blocking.blocking(ZIO.descriptor.map(_.executor.asEC))
       _ <-
         BlazeServerBuilder[Task](bec)
           .bindHttp(svConfig.port.value, svConfig.host.value)
