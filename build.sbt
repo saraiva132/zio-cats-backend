@@ -40,7 +40,8 @@ lazy val thisBuildSettings = inThisBuild(
             ("Implementation-Version", (ThisProject / version).value)
           )
         ),
-    libraryDependencies ++= dependencies ++ plugins
+    libraryDependencies ++= dependencies ++ plugins,
+    scalacOptions += "-Ymacro-annotations"
   )
 )
 

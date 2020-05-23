@@ -7,16 +7,16 @@ object Dependencies {
   object ZIO {
     val zioVersion     = "1.0.0-RC19-2"
     val interopVersion = "2.0.0.0-RC14"
-    val macrosVersion  = "0.6.2"
-    val logging        = "0.2.9"
+    val loggingVersion = "0.2.9"
 
-    val zio             = "dev.zio" %% "zio"               % zioVersion
-    val zioStream       = "dev.zio" %% "zio-streams"       % zioVersion
-    val zioCatsInterop  = "dev.zio" %% "zio-interop-cats"  % interopVersion
-    val zioLogging      = "dev.zio" %% "zio-logging"       % logging
-    val zioLoggingSlf4j = "dev.zio" %% "zio-logging-slf4j" % logging
+    val zio          = "dev.zio" %% "zio"               % zioVersion
+    val streams      = "dev.zio" %% "zio-streams"       % zioVersion
+    val macros       = "dev.zio" %% "zio-macros"        % zioVersion
+    val catsInterop  = "dev.zio" %% "zio-interop-cats"  % interopVersion
+    val logging      = "dev.zio" %% "zio-logging"       % loggingVersion
+    val loggingSlf4j = "dev.zio" %% "zio-logging-slf4j" % loggingVersion
 
-    val all: Seq[ModuleID] = Seq(zio, zioStream, zioCatsInterop, zioLogging, zioLoggingSlf4j)
+    val all: Seq[ModuleID] = Seq(zio, streams, macros, catsInterop, logging, loggingSlf4j)
   }
 
   object Cats {
