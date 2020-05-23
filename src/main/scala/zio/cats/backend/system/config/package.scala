@@ -1,11 +1,13 @@
 package zio.cats.backend.system
 
-import pureconfig.ConfigSource
-import zio.{Task, _}
-import pureconfig.generic.auto._
-import eu.timepit.refined.pureconfig._
-import zio.logging.{Logging, log}
 import scala.jdk.CollectionConverters._
+
+import eu.timepit.refined.pureconfig._
+import pureconfig.ConfigSource
+import pureconfig.generic.auto._
+
+import zio.logging.{Logging, log}
+import zio.{Task, _}
 
 package object config {
 

@@ -9,4 +9,6 @@ final case class User(userId: UserId, email: Email, firstName: NonEmptyString, l
 
 object User {
   implicit val codec: Codec[User] = deriveCodec
+
+  val Test = User(UserId.Test, Email.Test, NonEmptyString.unsafeFrom("first"), NonEmptyString.unsafeFrom("last"))
 }

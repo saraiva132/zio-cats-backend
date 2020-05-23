@@ -1,9 +1,11 @@
 package zio.cats.backend.data
 
-import io.circe.{Decoder, Encoder}
 import scala.util.matching.Regex
-import zio.{IO, UIO}
+
+import io.circe.{Decoder, Encoder}
+
 import zio.cats.backend.data.Error.EmailNotValid
+import zio.{IO, UIO}
 
 final case class Email private (value: String)
 
@@ -20,4 +22,6 @@ object Email {
 
   implicit val encoder: Encoder[Email] = Encoder.encodeString.contramap(_.value)
   implicit val decoder: Decoder[Email] = Decoder.decodeString.map(apply)
+
+  val Test = Email("test@test.com")
 }

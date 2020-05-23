@@ -3,9 +3,10 @@ package zio.cats.backend.system.dbtransactor
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location
 import org.flywaydb.core.api.configuration.ClassicConfiguration
-import zio.{Has, RIO, ZIO}
+
 import zio.cats.backend.system.config._
 import zio.logging.{Logging, log}
+import zio.{Has, RIO, ZIO}
 
 object Migration {
 

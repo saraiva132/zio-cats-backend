@@ -1,15 +1,17 @@
 package zio.cats.backend.http.routes
 
 import cats.implicits._
+
 import org.http4s.HttpRoutes
 import sttp.tapir.json.circe._
 import sttp.tapir.server.http4s.ztapir._
 import sttp.tapir.ztapir._
+
+import zio._
+import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
 import zio.cats.backend.services.healthcheck.Health._
 import zio.cats.backend.services.healthcheck.{HealthCheck, _}
 import zio.interop.catz._
-import zio._
-import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
 
 final class HealthCheckRoutes {
 

@@ -1,14 +1,17 @@
 package zio.cats.backend.system
 
-import cats.effect.Blocker
-import doobie.h2.H2Transactor
-import doobie.util.transactor.Transactor
 import scala.concurrent.ExecutionContext
+
+import cats.effect.Blocker
+
+import doobie.hikari.HikariTransactor
+import doobie.util.transactor.Transactor
+
 import zio.blocking.Blocking
-import zio.{Has, Managed, Task, URIO, ZIO, ZLayer, blocking}
 import zio.cats.backend.system.config.PostgresConfig
 import zio.interop.catz._
-import zio.logging.{Logging}
+import zio.logging.Logging
+import zio.{Has, Managed, Task, URIO, ZIO, ZLayer, ZManaged, blocking}
 
 package object dbtransactor {
 
@@ -20,8 +23,9 @@ package object dbtransactor {
       connectEC: ExecutionContext,
       transactEC: ExecutionContext
     ): Managed[Throwable, Transactor[Task]] =
-      H2Transactor
-        .newH2Transactor[Task](
+      HikariTransactor
+        .newHikariTransactor[Task](
+          "org.postgresql.Driver",
           conf.url.value,
           conf.user.value,
           conf.password.value,
@@ -30,16 +34,17 @@ package object dbtransactor {
         )
         .toManagedZIO
 
+    val managed: ZManaged[Has[PostgresConfig] with Logging with Blocking, Throwable, Transactor[Task]] =
+      for {
+        _          <- Migration.migrate.toManaged_
+        config     <- config.dbConfig.toManaged_
+        connectEC  <- ZIO.descriptor.map(_.executor.asEC).toManaged_
+        blockingEC <- blocking.blocking(ZIO.descriptor.map(_.executor.asEC)).toManaged_
+        transactor <- makeTransactor(config, connectEC, blockingEC)
+      } yield transactor
+
     val live: ZLayer[Has[PostgresConfig] with Logging with Blocking, Throwable, DBTransactor] =
-      ZLayer.fromManaged(
-        for {
-          _          <- Migration.migrate.toManaged_
-          config     <- config.dbConfig.toManaged_
-          connectEC  <- ZIO.descriptor.map(_.executor.asEC).toManaged_
-          blockingEC <- blocking.blocking(ZIO.descriptor.map(_.executor.asEC)).toManaged_
-          transactor <- makeTransactor(config, connectEC, blockingEC)
-        } yield transactor
-      )
+      ZLayer.fromManaged(managed)
   }
 
   val transactor: URIO[DBTransactor, Transactor[Task]] = ZIO.access(_.get)

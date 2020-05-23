@@ -1,14 +1,15 @@
 package zio.cats.backend.persistence
 
 import doobie.implicits._
-import doobie.{Query0, Update0}
 import doobie.refined.implicits._
 import doobie.util.transactor.Transactor
+import doobie.{Query0, Update0}
+
 import zio._
 import zio.cats.backend.data.{User, UserId}
-import zio.interop.catz._
 import zio.cats.backend.system.dbtransactor
 import zio.cats.backend.system.dbtransactor.DBTransactor
+import zio.interop.catz._
 
 /**
   * Persistence Module for production using Doobie
@@ -37,7 +38,7 @@ final class UserPersistenceSQL(tnx: Transactor[Task]) extends Persistence.Servic
       .fold(_ => false, _ => true)
 
   def isHealthy: Task[Boolean] =
-    Queries.health.unique
+    Queries.health.option
       .transact(tnx)
       .fold(_ => false, _ => true)
 }

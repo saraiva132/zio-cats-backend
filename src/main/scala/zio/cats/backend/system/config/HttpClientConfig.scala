@@ -1,7 +1,8 @@
 package zio.cats.backend.system.config
 
-import eu.timepit.refined.types.numeric.PosInt
 import scala.concurrent.duration._
+
+import eu.timepit.refined.types.numeric.PosInt
 
 final case class HttpClientConfig(
   maxConnections: PosInt = HttpClientConfig.defaultMaxConnections,

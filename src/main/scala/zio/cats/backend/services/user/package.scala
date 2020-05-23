@@ -1,10 +1,10 @@
 package zio.cats.backend.services
 
-import zio.{Has, RIO, Task, UIO, ULayer, ZLayer}
+import zio.cats.backend.data.Error.UserNotFound
 import zio.cats.backend.data.{PostUser, User, UserId}
 import zio.cats.backend.persistence.UserPersistenceSQL._
 import zio.cats.backend.services.reqres.reqres._
-import zio.cats.backend.data.Error.UserNotFound
+import zio.{Has, RIO, Task, UIO, ULayer, ZLayer}
 
 package object user {
 

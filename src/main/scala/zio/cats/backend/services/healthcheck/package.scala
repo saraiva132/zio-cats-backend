@@ -1,9 +1,9 @@
 package zio.cats.backend.services
 
-import zio.cats.backend.services.healthcheck.Health.{Healthy, Unhealthy}
-import zio.{Has, RIO, ULayer, ZLayer}
 import zio.cats.backend.persistence.UserPersistenceSQL
 import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
+import zio.cats.backend.services.healthcheck.Health.{Healthy, Unhealthy}
+import zio.{Has, RIO, ULayer, ZLayer}
 
 package object healthcheck {
 

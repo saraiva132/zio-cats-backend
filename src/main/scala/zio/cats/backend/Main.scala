@@ -1,15 +1,16 @@
 package zio.cats.backend
 
 import sttp.client.asynchttpclient.zio.AsyncHttpClientZioBackend
+
 import zio.blocking.Blocking
-import zio.cats.backend.services.reqres.ReqResClient
 import zio.cats.backend.http.Server
-import zio.cats.backend.system.logging.Logger
 import zio.cats.backend.persistence.UserPersistenceSQL
 import zio.cats.backend.services.healthcheck.HealthCheck
+import zio.cats.backend.services.reqres.ReqResClient
 import zio.cats.backend.services.user.UserManager
 import zio.cats.backend.system.config.Config
 import zio.cats.backend.system.dbtransactor.DBTransactor
+import zio.cats.backend.system.logging.Logger
 import zio.logging.log
 import zio.{App, UIO, ZEnv, ZIO}
 

@@ -1,21 +1,23 @@
 package zio.cats.backend.http
 
+import cats.implicits._
+
 import org.http4s.HttpApp
-import org.http4s.server.blaze.BlazeServerBuilder
-import zio.cats.backend.system.config.HttpServerConfig
-import zio.{Has, Runtime, Task, URIO, ZIO, blocking}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
+import org.http4s.server.blaze.BlazeServerBuilder
+import sttp.tapir.openapi.circe.yaml._
+import sttp.tapir.swagger.http4s.SwaggerHttp4s
+
 import zio.blocking.Blocking
 import zio.cats.backend.AppEnv
 import zio.cats.backend.http.routes.{HealthCheckRoutes, UserRoutes}
 import zio.cats.backend.system.config
+import zio.cats.backend.system.config.HttpServerConfig
 import zio.clock.Clock
-import zio.interop.catz.implicits._
 import zio.interop.catz._
-import cats.implicits._
-import sttp.tapir.openapi.circe.yaml._
-import sttp.tapir.swagger.http4s.SwaggerHttp4s
+import zio.interop.catz.implicits._
+import zio.{Has, Runtime, Task, URIO, ZIO, blocking}
 
 final class Server() extends Http4sDsl[Task[*]] {
 

@@ -1,22 +1,24 @@
 package zio.cats.backend.http.routes
 
+import cats.implicits._
+
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
 import org.http4s.HttpRoutes
+import sttp.tapir.docs.openapi._
 import sttp.tapir.json.circe._
-import sttp.tapir.ztapir.{ZEndpoint, endpoint}
 import sttp.tapir.server.http4s.ztapir._
 import sttp.tapir.ztapir._
-import zio.cats.backend.services.reqres.reqres.ReqRes
+import sttp.tapir.ztapir.{ZEndpoint, endpoint}
+
 import zio.cats.backend.data._
 import zio.cats.backend.http.routes.UserRoutes.ClientError
 import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
-import zio.{Task, URIO}
+import zio.cats.backend.services.reqres.reqres.ReqRes
 import zio.cats.backend.services.user
 import zio.cats.backend.services.user.UserManager
 import zio.interop.catz._
-import cats.implicits._
-import sttp.tapir.docs.openapi._
+import zio.{Task, URIO}
 
 final class UserRoutes {
 
@@ -24,11 +26,11 @@ final class UserRoutes {
   private val postUser: ZEndpoint[PostUser, ClientError, Unit] =
     endpoint.post.in("users").in(jsonBody[PostUser]).errorOut(jsonBody[ClientError])
 
-  private val getUser: ZEndpoint[String, ClientError, User] =
-    endpoint.get.in("users" / path[String]("email")).errorOut(jsonBody[ClientError]).out(jsonBody[User])
+  private val getUser: ZEndpoint[Int, ClientError, User] =
+    endpoint.get.in("users" / path[Int]("email")).errorOut(jsonBody[ClientError]).out(jsonBody[User])
 
-  private val deleteUser: ZEndpoint[String, ClientError, Unit] =
-    endpoint.delete.in("users" / path[String]("email")).errorOut(jsonBody[ClientError])
+  private val deleteUser: ZEndpoint[Int, ClientError, Unit] =
+    endpoint.delete.in("users" / path[Int]("email")).errorOut(jsonBody[ClientError])
 
   //Route implementation
   private val postUserRoute: URIO[UserManager with UserPersistence with ReqRes, HttpRoutes[Task]] =

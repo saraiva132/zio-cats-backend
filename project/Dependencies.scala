@@ -52,7 +52,6 @@ object Dependencies {
     val swagger          = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s"  % version
 
     val all: Seq[ModuleID] = Seq(core, docs, openApiCirce, openApiCirceYaml, sttp, http4s, zio, zioHttp4sServer, circe, swagger)
-
   }
 
   object STTP {
@@ -63,7 +62,6 @@ object Dependencies {
     val clientCirce = "com.softwaremill.sttp.client" %% "circe"                         % version
 
     val all: Seq[ModuleID] = Seq(zioClient, clientCirce)
-
   }
 
   object Http4s {
@@ -83,12 +81,12 @@ object Dependencies {
   object Doobie {
     private val version = "0.9.0"
 
-    val core    = "org.tpolecat" %% "doobie-core"    % version
-    val h2      = "org.tpolecat" %% "doobie-h2"      % version
-    val refined = "org.tpolecat" %% "doobie-refined" % version
+    val core     = "org.tpolecat" %% "doobie-core"     % version
+    val hikari   = "org.tpolecat" %% "doobie-hikari"   % version
+    val postgres = "org.tpolecat" %% "doobie-postgres" % version
+    val refined  = "org.tpolecat" %% "doobie-refined"  % version
 
-    val all: Seq[ModuleID] = Seq(core, h2, refined)
-
+    val all: Seq[ModuleID] = Seq(core, hikari, refined, postgres)
   }
 
   object Circe {
@@ -121,15 +119,13 @@ object Dependencies {
     val circe = "com.beachape" %% "enumeratum-circe" % version
 
     val all: Seq[ModuleID] = Seq(core, circe)
-
   }
 
   object Flyway {
-    val core = "org.flywaydb" % "flyway-core" % "6.4.2"
-    val driver = "org.postgresql" % "postgresql" % "42.2.12"
+    val core   = "org.flywaydb"   % "flyway-core" % "6.4.2"
+    val driver = "org.postgresql" % "postgresql"  % "42.2.12"
 
     val all: Seq[ModuleID] = Seq(core, driver)
-
   }
 
   object Config {
