@@ -45,10 +45,13 @@ To run tests with a clean service
 
 #### API
 
-`service:port/users` for user API
-`service:port/docs` for documentation
-`service:port/health/alive` for aliveness check
-`service:port/health/ready` for readiness check
+`host:port/users` for user API
+
+`host:port/docs` for documentation
+
+`host:port/health/alive` for aliveness check
+
+`host:port/health/ready` for readiness check
 
 
 
