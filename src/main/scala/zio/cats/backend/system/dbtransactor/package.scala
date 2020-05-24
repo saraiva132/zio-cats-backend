@@ -34,7 +34,7 @@ package object dbtransactor {
         )
         .toManagedZIO
 
-    val managedTest: ZManaged[Has[PostgresConfig] with Logging with Blocking, Throwable, Transactor[Task]] =
+    val managed: ZManaged[Has[PostgresConfig] with Blocking, Throwable, Transactor[Task]] =
       for {
         config     <- Config.dbConfig.toManaged_
         connectEC  <- ZIO.descriptor.map(_.executor.asEC).toManaged_
@@ -42,14 +42,17 @@ package object dbtransactor {
         transactor <- makeTransactor(config, connectEC, blockingEC)
       } yield transactor
 
-    val managedLive: ZManaged[Has[PostgresConfig] with Logging with Blocking, Throwable, Transactor[Task]] =
+    val managedWithMigration: ZManaged[Has[PostgresConfig] with Logging with Blocking, Throwable, Transactor[Task]] =
       for {
         _          <- Migration.migrate.toManaged_
-        transactor <- managedTest
+        transactor <- managed
       } yield transactor
 
+    val test: ZLayer[Has[PostgresConfig] with Blocking, Throwable, DBTransactor] =
+      ZLayer.fromManaged(managed)
+
     val live: ZLayer[Has[PostgresConfig] with Logging with Blocking, Throwable, DBTransactor] =
-      ZLayer.fromManaged(managedLive)
+      ZLayer.fromManaged(managedWithMigration)
 
     val transactor: URIO[DBTransactor, Transactor[Task]] = ZIO.access(_.get)
 

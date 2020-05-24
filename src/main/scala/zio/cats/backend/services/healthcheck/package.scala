@@ -26,5 +26,4 @@ package object healthcheck {
     val healthStatus: RIO[HealthCheck with UserPersistence, Health] = RIO.accessM(_.get.healthStatus)
 
   }
-
 }

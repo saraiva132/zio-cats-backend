@@ -14,31 +14,31 @@ import zio.interop.catz._
 /**
   * Persistence Module for production using Doobie
   */
-final class UserPersistenceSQL(tnx: Transactor[Task]) extends UserPersistence.Service {
+final class UserPersistenceSQL(trx: Transactor[Task]) extends UserPersistence.Service {
 
   def retrieve(userId: UserId): Task[Option[User]] =
     Queries
       .get(userId)
       .option
-      .transact(tnx)
+      .transact(trx)
 
   def create(user: User): Task[User] =
     Queries
       .create(user)
       .run
-      .transact(tnx)
+      .transact(trx)
       .foldM(err => Task.fail(err), _ => Task.succeed(user))
 
   def delete(userId: UserId): Task[Boolean] =
     Queries
       .delete(userId)
       .run
-      .transact(tnx)
+      .transact(trx)
       .fold(_ => false, _ => true)
 
   def isHealthy: Task[Boolean] =
     Queries.health.option
-      .transact(tnx)
+      .transact(trx)
       .fold(_ => false, _ => true)
 }
 

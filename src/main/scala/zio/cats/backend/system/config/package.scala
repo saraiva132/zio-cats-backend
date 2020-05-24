@@ -12,20 +12,20 @@ import zio.{Task, _}
 /**
   * Config loading in ZIO has two approaches to it that I see.
   *
- * 1.   Provide a type alias using type intersection similar to how it is used here.
+  * 1.   Provide a type alias using type intersection similar to how it is used here.
   *      I.e. type Config = Has[HttpServerConfig] with Has[HttpClientConfig]
   *      expose access to the inner parts of the config
   *
- * 2.   Create a minimalist service with a method load / loadConfig
+  * 2.   Create a minimalist service with a method load / loadConfig
   *      type ConfigService = Has[ConfigService.Service]
   *
- *      object ConfigService {
+  *      object ConfigService {
   *
- *      trait Service {
+  *      trait Service {
   *        def loadConfig: UIO[Config]
   *      }
   *
- *      val live: ZLayer[Any, Nothing, ConfigService] =
+  *      val live: ZLayer[Any, Nothing, ConfigService] =
   *        ZLayer.succeed {
   *          new Service {
   *            def loadConfig: UIO[Config] = ???
@@ -33,18 +33,18 @@ import zio.{Task, _}
   *        }
   *      }
   *
- *      Expose the inner parts of the Config using either access methods or type alias
+  *      Expose the inner parts of the Config using either access methods or type alias
   *
- *      type PostgresConfigService = Has[PostgresConfig]
+  *      type PostgresConfigService = Has[PostgresConfig]
   *
- *      object PostgresConfigService {
+  *      object PostgresConfigService {
   *      val live: ZLayer[ConfigService, Nothing, PostgresConfigService] =
   *        ZLayer.fromServiceM { (config: ConfigService.Service) =>
   *          config.loadConfig.map(_.dbConfig)
   *        }
   *      }
   *
- */
+  */
 package object config {
 
   type Config = Has[HttpServerConfig] with Has[HttpClientConfig] with Has[PostgresConfig] with Has[ReqResConfig]

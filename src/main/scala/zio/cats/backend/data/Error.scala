@@ -13,6 +13,6 @@ object Error {
       extends Throwable(s"Error fetching user $userId with reason $reason!")
       with Error
 
-  final case class DatabaseError(error : String)  extends Throwable(s"Error accessing persistence layer: $error.") with Error
+  final case class DatabaseError(error: String) extends Throwable(s"Error accessing persistence layer: $error.") with Error
 
 }

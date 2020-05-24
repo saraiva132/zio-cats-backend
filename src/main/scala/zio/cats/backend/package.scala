@@ -10,7 +10,7 @@ import zio.logging.Logging
 
 package object backend {
 
-  type ServiceEnv = UserService with UserPersistence with ReqResClient with HealthCheck
-  type AppEnv     = ServiceEnv with ZEnv with Config with Logging
+  type UserServiceEnv = UserService with UserPersistence with ReqResClient with Logging
+  type AppEnv         = UserServiceEnv with ZEnv with Config with HealthCheck
 
 }

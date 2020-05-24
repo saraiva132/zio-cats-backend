@@ -3,6 +3,7 @@
 ## ./run-service.sh -d to clean images
 ## ./run-service.sh -dpbr to run service
 ## ./run-service.sh -drt to run tests with a clean service
+## ./run-service.sh -t to run tests
 
 while getopts 'dpbrt' flag; do
   case "${flag}" in

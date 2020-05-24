@@ -8,19 +8,22 @@ import sttp.model.StatusCode
 import zio.clock.Clock
 import zio.duration._
 
-object StartUpCleanUp {
+/**
+ * Experimenting with using layers to create beforeAll/afterAll behaviour
+ */
+object BeforeAllAfterAll {
 
   type dummyService = Has[Unit]
 
-  val healthCheck = basicRequest.get(uri"$healthCheckEndpoint")
+  private val healthCheck = basicRequest.get(uri"$healthCheckEndpoint")
 
-  def acquire: ZIO[SttpClient with Clock, Throwable, Unit] =
+  private val acquire: ZIO[SttpClient with Clock, Throwable, Unit] =
     for {
       client <- ZIO.access[SttpClient](_.get)
       _      <- client.send(healthCheck).delay(100.millis).doUntil(_.code == StatusCode.Ok)
     } yield ()
 
-  def live: ZLayer[SttpClient with Clock, Throwable, dummyService] =
+  val live: ZLayer[SttpClient with Clock, Throwable, dummyService] =
     ZLayer.fromAcquireRelease(acquire)(_ => UIO.unit)
 
 }

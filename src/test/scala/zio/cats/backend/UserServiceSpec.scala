@@ -22,8 +22,10 @@ object UserServiceSpec extends DefaultRunnableSpec {
           ReqResClientMock.FetchUser(equalTo(UserId.Test), value(User.Test)) ++
               UserPersistenceMock.Create(equalTo(User.Test), value(User.Test))
 
-        val app    = UserService.createUser(PostUser.Test)
-        val result = app.provideLayer(mocks ++ UserService.live)
+        val result = UserService
+          .createUser(PostUser.Test)
+          .provideLayer(mocks ++ UserService.live)
+
         assertM(result)(Assertion.isUnit)
       },
       testM("create user fails: not found in reqres") {
@@ -31,8 +33,10 @@ object UserServiceSpec extends DefaultRunnableSpec {
           ReqResClientMock.FetchUser(equalTo(UserId.Test), failure(UserNotFound(UserId.Test))) ++
               UserPersistenceMock.Create(equalTo(User.Test), value(User.Test))
 
-        val app    = UserService.createUser(PostUser.Test)
-        val result = app.provideLayer(mocks ++ UserService.live)
+        val result = UserService
+          .createUser(PostUser.Test)
+          .provideLayer(mocks ++ UserService.live)
+
         assertM(result.run)(fails(isSubtype[UserNotFound](anything)))
       },
       testM("create user fails: reqres error") {
@@ -40,42 +44,51 @@ object UserServiceSpec extends DefaultRunnableSpec {
           ReqResClientMock.FetchUser(equalTo(UserId.Test), failure(ErrorFetchingUser(UserId.Test, "Fails"))) ++
               UserPersistenceMock.Create(equalTo(User.Test), value(User.Test))
 
-        val app    = UserService.createUser(PostUser.Test)
-        val result = app.provideLayer(mocks ++ UserService.live)
+        val result = UserService
+          .createUser(PostUser.Test)
+          .provideLayer(mocks ++ UserService.live)
+
         assertM(result.run)(fails(isSubtype[ErrorFetchingUser](anything)))
       },
       testM("get user success") {
         val mock: ULayer[UserPersistence] =
           UserPersistenceMock.Retrieve(equalTo(UserId.Test), value(User.Test.some))
 
-        val app    = UserService.getUser(UserId.Test)
-        val result = app.provideLayer(mock ++ UserService.live)
+        val result = UserService
+          .getUser(UserId.Test)
+          .provideLayer(mock ++ UserService.live)
+
         assertM(result)(equalTo(User.Test))
       },
       testM("get user fails: not found") {
         val mock: ULayer[UserPersistence] =
           UserPersistenceMock.Retrieve(equalTo(UserId.Test), value(None))
 
-        val app    = UserService.getUser(UserId.Test)
-        val result = app.provideLayer(mock ++ UserService.live)
+        val result = UserService
+          .getUser(UserId.Test)
+          .provideLayer(mock ++ UserService.live)
+
         assertM(result.run)(fails(isSubtype[UserNotFound](anything)))
       },
       testM("delete user success") {
         val mock: ULayer[UserPersistence] =
           UserPersistenceMock.Delete(equalTo(UserId.Test), value(true))
 
-        val app    = UserService.deleteUser(UserId.Test)
-        val result = app.provideLayer(mock ++ UserService.live)
+        val result = UserService
+          .deleteUser(UserId.Test)
+          .provideLayer(mock ++ UserService.live)
+
         assertM(result)(Assertion.isUnit)
       },
       testM("delete user fails: not found") {
         val mock: ULayer[UserPersistence] =
           UserPersistenceMock.Delete(equalTo(UserId.Test), value(false))
 
-        val app    = UserService.deleteUser(UserId.Test)
-        val result = app.provideLayer(mock ++ UserService.live)
+        val result = UserService
+          .deleteUser(UserId.Test)
+          .provideLayer(mock ++ UserService.live)
+
         assertM(result.run)(fails(isSubtype[UserNotFound](anything)))
       }
     )
-
 }

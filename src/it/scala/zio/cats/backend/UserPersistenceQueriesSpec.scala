@@ -2,7 +2,7 @@ package zio.cats.backend
 
 import zio.test.{DefaultRunnableSpec, suite, testM}
 import zio.test.TestAspect._
-import zio.cats.backend.testkit.ZIOChecker
+import zio.cats.backend.testkit.QueryChecker
 import zio.cats.backend.system.dbtransactor.DBTransactor
 import zio.{Exit, Runtime}
 import zio.ZManaged.ReleaseMap
@@ -12,15 +12,18 @@ import zio.cats.backend.persistence.UserPersistenceSQL.Queries
 import zio.cats.backend.system.config.Config
 import zio.cats.backend.system.logging.Logger
 
-object UserPersistenceQueriesSpec extends DefaultRunnableSpec with ZIOChecker {
+object UserPersistenceQueriesSpec extends DefaultRunnableSpec with QueryChecker {
 
+  /**
+   * Hack to get doobie query check to work with ZIO
+   */
   val runtime    = Runtime.default //Use test runtime
   val releaseMap = runtime.unsafeRun(ReleaseMap.make)
 
   val configLayer = Logger.test >>> Config.live ++ Blocking.live
   val finalLayer  = (configLayer ++ Logger.test).map(cfg => (cfg, releaseMap))
 
-  val transactorF             = DBTransactor.managedTest.zio.provideLayer(finalLayer)
+  val transactorF             = DBTransactor.managed.zio.provideLayer(finalLayer)
   val (finalizer, transactor) = runtime.unsafeRun(transactorF)
 
   def spec =

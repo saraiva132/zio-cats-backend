@@ -1,22 +1,22 @@
 package zio.cats.backend.http.routes
 
 import cats.implicits._
+
 import org.http4s.HttpRoutes
+import sttp.model.StatusCode
 import sttp.tapir.docs.openapi._
 import sttp.tapir.json.circe._
 import sttp.tapir.server.http4s.ztapir._
 import sttp.tapir.ztapir._
 import sttp.tapir.ztapir.{ZEndpoint, endpoint}
+
+import zio.cats.backend.UserServiceEnv
 import zio.cats.backend.data._
 import zio.cats.backend.http.ClientError
-import zio.cats.backend.persistence.UserPersistence
-import zio.cats.backend.services.reqres.reqres.ReqResClient
+import zio.cats.backend.http.ClientError._
 import zio.cats.backend.services.user.UserService
 import zio.interop.catz._
 import zio.{Task, URIO}
-import ClientError._
-import sttp.model.StatusCode
-import zio.logging.Logging
 
 object UserRoutes {
 
@@ -54,7 +54,7 @@ object UserRoutes {
       )
 
   //Route implementation
-  private val postUserRoute: URIO[UserService with UserPersistence with ReqResClient with Logging, HttpRoutes[Task]] =
+  private val postUserRoute: URIO[UserServiceEnv, HttpRoutes[Task]] =
     postUser
       .toRoutesR(postUser =>
         UserService
@@ -62,7 +62,7 @@ object UserRoutes {
           .mapToClientError
       )
 
-  private val getUserRoute: URIO[UserService with UserPersistence with Logging, HttpRoutes[Task]] =
+  private val getUserRoute: URIO[UserServiceEnv, HttpRoutes[Task]] =
     getUser
       .toRoutesR(userId =>
         UserService
@@ -70,7 +70,7 @@ object UserRoutes {
           .mapToClientError
       )
 
-  private val deleteUserRoute: URIO[UserService with UserPersistence with Logging, HttpRoutes[Task]] =
+  private val deleteUserRoute: URIO[UserServiceEnv, HttpRoutes[Task]] =
     deleteUser
       .toRoutesR(userId =>
         UserService
@@ -78,7 +78,7 @@ object UserRoutes {
           .mapToClientError
       )
 
-  val routes: URIO[UserService with UserPersistence with ReqResClient with Logging, HttpRoutes[Task]] = for {
+  val routes: URIO[UserServiceEnv, HttpRoutes[Task]] = for {
     postUserRoute   <- postUserRoute
     getUserRoute    <- getUserRoute
     deleteUserRoute <- deleteUserRoute

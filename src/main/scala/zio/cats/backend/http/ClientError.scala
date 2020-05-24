@@ -2,9 +2,10 @@ package zio.cats.backend.http
 
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
-import zio.ZIO
+
 import zio.cats.backend.data.Error._
 import zio.logging.{Logging, log}
+import zio.{Cause, ZIO}
 
 sealed trait ClientError extends Product with Serializable
 
@@ -19,15 +20,20 @@ object ClientError {
     implicit val codec: Codec[BadRequest] = deriveCodec
   }
 
-  //Naive implementation because it is not exposing the full error Cause
-  implicit class mapError[R, E, A](val f: ZIO[R, E, A]) extends AnyVal {
+  /**
+    * Expose the full error cause when handling a request and recovers failures and deaths appropriately.
+    */
+  implicit class mapError[R, E, A](private val f: ZIO[R, E, A]) extends AnyVal {
     def mapToClientError: ZIO[R with Logging, ClientError, A] =
       f.tapError(error => log.error(s"Error processing request: $error."))
-        .mapError {
-          case r: UserNotFound      => BadRequest(r.getMessage)
-          case r: ErrorFetchingUser => BadRequest(r.getMessage)
-          case r: EmailNotValid     => BadRequest(r.getMessage)
-          case _                    => InternalServerError("Internal Server Error")
+        .mapErrorCause { cause =>
+          val clientFailure = cause.failureOrCause match {
+            case Left(r: UserNotFound)  => BadRequest(r.getMessage)
+            case Left(r: EmailNotValid) => BadRequest(r.getMessage)
+            case Left(_)                => InternalServerError("Internal Server Error")
+            case Right(_)               => InternalServerError("Internal Server Error")
+          }
+          Cause.fail(clientFailure)
         }
   }
 }

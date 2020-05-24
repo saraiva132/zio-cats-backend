@@ -14,7 +14,7 @@ import zio.interop.catz._
 import zio.test.{Assertion, TestResult, assert}
 import zio.{Task, ZEnv, Runtime}
 
-trait ZIOChecker extends CheckerBase[Task] {
+trait QueryChecker extends CheckerBase[Task] {
 
   implicit def runtime: Runtime[ZEnv] //Use test runtime
   def M: Effect[Task] = implicitly

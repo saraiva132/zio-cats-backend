@@ -1,25 +1,27 @@
 package zio.cats.backend.http
 
 import cats.implicits._
+
 import org.http4s.HttpApp
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import sttp.tapir.openapi.circe.yaml._
 import sttp.tapir.swagger.http4s.SwaggerHttp4s
+
 import zio.cats.backend.http.routes.{HealthCheckRoutes, UserRoutes}
+import zio.cats.backend.services.healthcheck.HealthCheck
 import zio.cats.backend.system.config.Config
-import zio.cats.backend.{AppEnv, ServiceEnv}
+import zio.cats.backend.{AppEnv, UserServiceEnv}
 import zio.clock.Clock
 import zio.interop.catz._
 import zio.interop.catz.implicits._
-import zio.logging.Logging
 import zio.{Runtime, Task, URIO, ZIO, blocking}
 
 object Server {
 
   private val userDocs = UserRoutes.docs.toYaml
 
-  private val appRoutes: URIO[ServiceEnv with Logging, HttpApp[Task]] =
+  private val appRoutes: URIO[UserServiceEnv with HealthCheck, HttpApp[Task]] =
     for {
       userRoutes        <- UserRoutes.routes
       healthCheckRoutes <- HealthCheckRoutes.routes
