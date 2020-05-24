@@ -1,8 +1,7 @@
 package zio.cats.backend.mocks
 
-import zio.cats.backend.data.{User, UserId}
-import zio.cats.backend.persistence.Persistence
+import zio.cats.backend.persistence.UserPersistence
 import zio.test.mock.mockable
 
-@mockable[Persistence.Service[UserId, User]]
+@mockable[UserPersistence.Service]
 object UserPersistenceMock

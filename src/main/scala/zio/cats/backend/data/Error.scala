@@ -1,6 +1,8 @@
 package zio.cats.backend.data
 
-sealed trait Error
+import scala.util.control.NoStackTrace
+
+sealed trait Error extends Throwable with NoStackTrace
 object Error {
 
   final case class EmailNotValid(email: String) extends Throwable(s"Email $email is not valid.") with Error

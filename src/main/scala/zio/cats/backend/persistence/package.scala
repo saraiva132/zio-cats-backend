@@ -1,18 +1,25 @@
 package zio.cats.backend
 
-import zio.{Has, Task}
+import zio.cats.backend.data.{User, UserId}
+import zio.{Has, RIO, Task}
 
 package object persistence {
 
-  type Persistence[I, O] = Has[Persistence.Service[I, O]]
+  type UserPersistence = Has[UserPersistence.Service]
 
-  object Persistence {
-    trait Service[I, O] {
-      def retrieve(i: I): Task[Option[O]]
-      def create(a: O): Task[O]
-      def delete(i: I): Task[Boolean]
-      def isHealthy : Task[Boolean]
+  object UserPersistence {
+
+    trait Service {
+      def retrieve(userId: UserId): Task[Option[User]]
+      def create(user: User): Task[User]
+      def delete(userId: UserId): Task[Boolean]
+      def isHealthy: Task[Boolean]
     }
+
+    def retrieve(userId: UserId): RIO[UserPersistence, Option[User]] = RIO.accessM(_.get.retrieve(userId))
+    def create(user: User): RIO[UserPersistence, User]               = RIO.accessM(_.get.create(user))
+    def delete(userId: UserId): RIO[UserPersistence, Boolean]        = RIO.accessM(_.get.delete(userId))
+    def isHealthy: RIO[UserPersistence, Boolean]                     = RIO.accessM(_.get.isHealthy)
   }
 
 }

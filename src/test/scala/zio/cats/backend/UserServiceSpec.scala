@@ -1,27 +1,79 @@
 package zio.cats.backend
 
 import zio.ULayer
-import zio.cats.backend.data.{User, UserId}
-import zio.cats.backend.mocks.UserPersistenceMock
-import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
+import zio.cats.backend.data.{PostUser, User, UserId}
+import zio.cats.backend.mocks.{ReqResClientMock, UserPersistenceMock}
+import zio.cats.backend.persistence.UserPersistence
 import zio.cats.backend.services.user.UserService
-import zio.test.{DefaultRunnableSpec, suite, testM}
+import zio.test.{DefaultRunnableSpec, suite, testM, _}
 import zio.test.Assertion._
 import zio.test.mock.Expectation._
-import zio.test._
+import cats.implicits._
+import zio.cats.backend.data.Error.{ErrorFetchingUser, UserNotFound}
+import zio.cats.backend.services.reqres.reqres.ReqResClient
 
 object UserServiceSpec extends DefaultRunnableSpec {
 
   def spec =
-    suite("User manager service")(
-      testM("get user") {
-        val env: ULayer[UserPersistence] =
-          UserPersistenceMock.Retrieve(equalTo("What is your name?"), value(User.Test))
+    suite("User Service")(
+      testM("create user success") {
+        val mocks: ULayer[UserPersistence with ReqResClient] =
+          ReqResClientMock.FetchUser(equalTo(UserId.Test), value(User.Test)) ++
+              UserPersistenceMock.Create(equalTo(User.Test), value(User.Test))
 
-        val app = UserService.getUser(UserId.Test)
+        val app    = UserService.createUser(PostUser.Test)
+        val result = app.provideLayer(mocks ++ UserService.live)
+        assertM(result)(Assertion.isUnit)
+      },
+      testM("create user fails: not found in reqres") {
+        val mocks: ULayer[UserPersistence with ReqResClient] =
+          ReqResClientMock.FetchUser(equalTo(UserId.Test), failure(UserNotFound(UserId.Test))) ++
+              UserPersistenceMock.Create(equalTo(User.Test), value(User.Test))
 
-        val result = app.provideLayer(env ++ UserService.live)
+        val app    = UserService.createUser(PostUser.Test)
+        val result = app.provideLayer(mocks ++ UserService.live)
+        assertM(result.run)(fails(isSubtype[UserNotFound](anything)))
+      },
+      testM("create user fails: reqres error") {
+        val mocks: ULayer[UserPersistence with ReqResClient] =
+          ReqResClientMock.FetchUser(equalTo(UserId.Test), failure(ErrorFetchingUser(UserId.Test, "Fails"))) ++
+              UserPersistenceMock.Create(equalTo(User.Test), value(User.Test))
+
+        val app    = UserService.createUser(PostUser.Test)
+        val result = app.provideLayer(mocks ++ UserService.live)
+        assertM(result.run)(fails(isSubtype[ErrorFetchingUser](anything)))
+      },
+      testM("get user success") {
+        val mock: ULayer[UserPersistence] =
+          UserPersistenceMock.Retrieve(equalTo(UserId.Test), value(User.Test.some))
+
+        val app    = UserService.getUser(UserId.Test)
+        val result = app.provideLayer(mock ++ UserService.live)
         assertM(result)(equalTo(User.Test))
+      },
+      testM("get user fails: not found") {
+        val mock: ULayer[UserPersistence] =
+          UserPersistenceMock.Retrieve(equalTo(UserId.Test), value(None))
+
+        val app    = UserService.getUser(UserId.Test)
+        val result = app.provideLayer(mock ++ UserService.live)
+        assertM(result.run)(fails(isSubtype[UserNotFound](anything)))
+      },
+      testM("delete user success") {
+        val mock: ULayer[UserPersistence] =
+          UserPersistenceMock.Delete(equalTo(UserId.Test), value(true))
+
+        val app    = UserService.deleteUser(UserId.Test)
+        val result = app.provideLayer(mock ++ UserService.live)
+        assertM(result)(Assertion.isUnit)
+      },
+      testM("delete user fails: not found") {
+        val mock: ULayer[UserPersistence] =
+          UserPersistenceMock.Delete(equalTo(UserId.Test), value(false))
+
+        val app    = UserService.deleteUser(UserId.Test)
+        val result = app.provideLayer(mock ++ UserService.live)
+        assertM(result.run)(fails(isSubtype[UserNotFound](anything)))
       }
     )
 

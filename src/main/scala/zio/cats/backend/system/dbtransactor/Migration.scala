@@ -24,6 +24,6 @@ object Migration {
           newFlyway.migrate()
         }.unit
       }
-      .tapError(err => log.error(s"Error migrating database $err."))
+      .tapError(err => log.error(s"Error migrating database: $err."))
 
 }

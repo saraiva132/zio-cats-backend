@@ -8,10 +8,13 @@ import sttp.model.StatusCode
 import zio._
 import zio.cats.backend.data.Error.{ErrorFetchingUser, UserNotFound}
 import zio.cats.backend.data.{User, UserId}
-import zio.cats.backend.services.reqres.reqres.ReqRes
+import zio.cats.backend.services.reqres.reqres.ReqResClient
 import zio.cats.backend.system.config.{Config, ReqResConfig}
 
-final class ReqResClient(client: SttpBackend[Task, Nothing, WebSocketHandler], config: ReqResConfig) extends ReqRes.Service {
+final class ReqResClientHTTP(
+  client: SttpBackend[Task, Nothing, WebSocketHandler],
+  config: ReqResConfig
+) extends ReqResClient.Service {
 
   private val endpoint = s"${config.host.value}:${config.port.value}"
   private val path     = "/api/users"
@@ -31,14 +34,12 @@ final class ReqResClient(client: SttpBackend[Task, Nothing, WebSocketHandler], c
 
 }
 
-object ReqResClient {
-
-  val live: URLayer[Has[ReqResConfig] with SttpClient, ReqRes] =
+object ReqResClientHTTP {
+  val live: URLayer[Has[ReqResConfig] with SttpClient, ReqResClient] =
     ZLayer.fromEffect(
       for {
-        client <- ZIO.environment[SttpClient]
+        client <- ZIO.access[SttpClient](_.get)
         config <- Config.reqResConfig
-      } yield new ReqResClient(client.get, config)
+      } yield new ReqResClientHTTP(client, config)
     )
-
 }

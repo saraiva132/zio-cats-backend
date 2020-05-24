@@ -2,8 +2,8 @@ package zio.cats.backend.services
 
 import zio.cats.backend.data.Error.UserNotFound
 import zio.cats.backend.data.{PostUser, User, UserId}
-import zio.cats.backend.persistence.UserPersistenceSQL._
-import zio.cats.backend.services.reqres.reqres._
+import zio.cats.backend.persistence.UserPersistence
+import zio.cats.backend.services.reqres.reqres.ReqResClient
 import zio.{Has, RIO, Task, UIO, ULayer, ZLayer}
 
 package object user {
@@ -12,7 +12,7 @@ package object user {
 
   object UserService {
     trait Service {
-      def createUser(postUser: PostUser): RIO[UserPersistence with ReqRes, Unit]
+      def createUser(postUser: PostUser): RIO[UserPersistence with ReqResClient, Unit]
       def getUser(userId: UserId): RIO[UserPersistence, User]
       def deleteUser(userId: UserId): RIO[UserPersistence, Unit]
     }
@@ -20,9 +20,9 @@ package object user {
     val live: ULayer[UserService] =
       ZLayer.succeed(
         new UserService.Service {
-          override def createUser(postUser: PostUser): RIO[UserPersistence with ReqRes, Unit] =
+          override def createUser(postUser: PostUser): RIO[UserPersistence with ReqResClient, Unit] =
             for {
-              user <- ReqRes.fetchUser(postUser.userId)
+              user <- ReqResClient.fetchUser(postUser.userId)
               _    <- UserPersistence.create(user)
             } yield ()
 
@@ -39,7 +39,7 @@ package object user {
         }
       )
 
-    def registerUser(postUser: PostUser): RIO[UserService with ReqRes with UserPersistence with ReqRes, Unit] =
+    def createUser(postUser: PostUser): RIO[UserService with ReqResClient with UserPersistence, Unit] =
       RIO.accessM(_.get.createUser(postUser))
 
     def getUser(userId: UserId): RIO[UserService with UserPersistence, User] =

@@ -8,12 +8,12 @@ import sttp.tapir.server.http4s.ztapir._
 import sttp.tapir.ztapir._
 
 import zio._
-import zio.cats.backend.persistence.UserPersistenceSQL.UserPersistence
+import zio.cats.backend.persistence.UserPersistence
 import zio.cats.backend.services.healthcheck.Health._
 import zio.cats.backend.services.healthcheck.HealthCheck
 import zio.interop.catz._
 
-final class HealthCheckRoutes {
+object HealthCheckRoutes {
 
   private val healthCheck: ZIO[HealthCheck with UserPersistence, String, String] =
     HealthCheck.healthStatus.orElseFail("Internal failure.").flatMap {
