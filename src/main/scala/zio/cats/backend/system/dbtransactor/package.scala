@@ -1,9 +1,12 @@
 package zio.cats.backend.system
 
 import scala.concurrent.ExecutionContext
+
 import cats.effect.Blocker
+
 import doobie.hikari.HikariTransactor
 import doobie.util.transactor.Transactor
+
 import zio.blocking.Blocking
 import zio.cats.backend.system.config.{Config, PostgresConfig}
 import zio.interop.catz._
@@ -22,7 +25,7 @@ package object dbtransactor {
     ): Managed[Throwable, Transactor[Task]] =
       HikariTransactor
         .newHikariTransactor[Task](
-          "org.postgresql.Driver",
+          conf.className.value,
           conf.url.value,
           conf.user.value,
           conf.password.value,
@@ -31,17 +34,22 @@ package object dbtransactor {
         )
         .toManagedZIO
 
-    val managed: ZManaged[Has[PostgresConfig] with Logging with Blocking, Throwable, Transactor[Task]] =
+    val managedTest: ZManaged[Has[PostgresConfig] with Logging with Blocking, Throwable, Transactor[Task]] =
       for {
-        _          <- Migration.migrate.toManaged_
         config     <- Config.dbConfig.toManaged_
         connectEC  <- ZIO.descriptor.map(_.executor.asEC).toManaged_
         blockingEC <- blocking.blocking(ZIO.descriptor.map(_.executor.asEC)).toManaged_
         transactor <- makeTransactor(config, connectEC, blockingEC)
       } yield transactor
 
+    val managedLive: ZManaged[Has[PostgresConfig] with Logging with Blocking, Throwable, Transactor[Task]] =
+      for {
+        _          <- Migration.migrate.toManaged_
+        transactor <- managedTest
+      } yield transactor
+
     val live: ZLayer[Has[PostgresConfig] with Logging with Blocking, Throwable, DBTransactor] =
-      ZLayer.fromManaged(managed)
+      ZLayer.fromManaged(managedLive)
 
     val transactor: URIO[DBTransactor, Transactor[Task]] = ZIO.access(_.get)
 

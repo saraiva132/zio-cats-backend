@@ -1,16 +1,17 @@
 package zio.cats.backend
 
+import cats.implicits._
+
 import zio.ULayer
+import zio.cats.backend.data.Error.{ErrorFetchingUser, UserNotFound}
 import zio.cats.backend.data.{PostUser, User, UserId}
 import zio.cats.backend.mocks.{ReqResClientMock, UserPersistenceMock}
 import zio.cats.backend.persistence.UserPersistence
+import zio.cats.backend.services.reqres.reqres.ReqResClient
 import zio.cats.backend.services.user.UserService
-import zio.test.{DefaultRunnableSpec, suite, testM, _}
 import zio.test.Assertion._
 import zio.test.mock.Expectation._
-import cats.implicits._
-import zio.cats.backend.data.Error.{ErrorFetchingUser, UserNotFound}
-import zio.cats.backend.services.reqres.reqres.ReqResClient
+import zio.test.{DefaultRunnableSpec, suite, testM, _}
 
 object UserServiceSpec extends DefaultRunnableSpec {
 

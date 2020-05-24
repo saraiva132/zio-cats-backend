@@ -1,8 +1,10 @@
 package zio.cats.backend.system.logging
 
-import zio.ULayer
+import zio.clock.Clock
+import zio.console.Console
 import zio.logging.slf4j.Slf4jLogger
 import zio.logging.{LogAnnotation, Logging}
+import zio.{ULayer, URLayer}
 
 object Logger {
 
@@ -15,7 +17,7 @@ object Logger {
     logFormat.format(correlationId, message)
   }
 
-  val test = Logging.console { (context, message) =>
+  val test: URLayer[Console with Clock, Logging] = Logging.console { (context, message) =>
     val correlationId = LogAnnotation.CorrelationId.render(
       context.get(LogAnnotation.CorrelationId)
     )

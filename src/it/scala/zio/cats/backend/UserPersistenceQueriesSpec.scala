@@ -20,7 +20,7 @@ object UserPersistenceQueriesSpec extends DefaultRunnableSpec with ZIOChecker {
   val configLayer = Logger.test >>> Config.live ++ Blocking.live
   val finalLayer  = (configLayer ++ Logger.test).map(cfg => (cfg, releaseMap))
 
-  val transactorF             = DBTransactor.managed.zio.provideLayer(finalLayer)
+  val transactorF             = DBTransactor.managedTest.zio.provideLayer(finalLayer)
   val (finalizer, transactor) = runtime.unsafeRun(transactorF)
 
   def spec =

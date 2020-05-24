@@ -5,7 +5,7 @@ import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
 import io.circe.refined._
 
-final case class User(userId: UserId, email: Email, firstName: NonEmptyString, lastName: NonEmptyString)
+final case class User(id: UserId, email: Email, first_name: NonEmptyString, last_name: NonEmptyString)
 
 object User {
   implicit val codec: Codec[User] = deriveCodec

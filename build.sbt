@@ -1,6 +1,9 @@
 import Dependencies._
 import sbt._
 import sbt.Package.ManifestAttributes
+import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
+import com.typesafe.sbt.packager.universal.UniversalPlugin
+import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport._
 
 val alias: Seq[sbt.Def.Setting[_]] =
   addCommandAlias(
@@ -20,6 +23,9 @@ lazy val zioCatsBackend = project
   .settings(alias)
   .settings(Defaults.itSettings)
   .configs(IntegrationTest extend Test)
+  .enablePlugins(UniversalPlugin)
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(DockerPlugin)
 
 lazy val thisBuildSettings = inThisBuild(
   Seq(
@@ -68,3 +74,6 @@ lazy val plugins = Seq(
 )
 
 ThisBuild / scalafixDependencies += "com.nequissimus" %% "sort-imports" % "0.3.1"
+
+packageName in Docker := "zio-cats-backend"
+version in Docker := "integration-test"

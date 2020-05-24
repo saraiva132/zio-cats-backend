@@ -2,8 +2,9 @@ package zio.cats.backend.http
 
 import sttp.client.SttpBackendOptions
 import sttp.client.asynchttpclient.zio.{AsyncHttpClientZioBackend, SttpClient}
-import zio.{Has, ZLayer}
+
 import zio.cats.backend.system.config.{Config, HttpClientConfig}
+import zio.{Has, ZLayer}
 
 object Client {
 

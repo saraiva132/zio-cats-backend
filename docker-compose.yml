@@ -1,5 +1,17 @@
 version: '3'
+
 services:
+
+  zio-cats-backend:
+    image: zio-cats-backend:integration-test
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/user
+      - DB_USER=user
+      - DB_PASSWORD=test123
+    depends_on:
+      - postgres
+    ports:
+      - 9001:9000
 
   postgres:
     image: postgres:12.3

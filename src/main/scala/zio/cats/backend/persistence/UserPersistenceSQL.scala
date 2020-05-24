@@ -4,6 +4,7 @@ import doobie.implicits._
 import doobie.refined.implicits._
 import doobie.util.transactor.Transactor
 import doobie.{Query0, Update0}
+
 import zio._
 import zio.cats.backend.data.{User, UserId}
 import zio.cats.backend.persistence.UserPersistenceSQL.Queries
@@ -48,7 +49,7 @@ object UserPersistenceSQL {
       sql"""SELECT * FROM USERS WHERE ID = ${userId.value} """.query[User]
 
     def create(user: User): Update0 =
-      sql"""INSERT INTO USERS (id, email) VALUES (${user.userId.value}, ${user.email.value})""".update
+      sql"""INSERT INTO USERS (id, email, first_name, last_name) VALUES (${user.id.value}, ${user.email.value}, ${user.first_name.value}, ${user.last_name.value})""".update
 
     def delete(userId: UserId): Update0 =
       sql"""DELETE FROM USERS WHERE id = ${userId.value}""".update
