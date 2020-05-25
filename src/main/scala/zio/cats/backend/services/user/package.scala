@@ -1,6 +1,6 @@
 package zio.cats.backend.services
 
-import zio.cats.backend.data.Error.{DatabaseError, UserNotFound}
+import zio.cats.backend.data.Error.UserNotFound
 import zio.cats.backend.data.{PostUser, User, UserId}
 import zio.cats.backend.persistence.UserPersistence
 import zio.cats.backend.services.reqres.reqres.ReqResClient
@@ -23,19 +23,17 @@ package object user {
           override def createUser(postUser: PostUser): RIO[UserPersistence with ReqResClient, Unit] =
             for {
               user <- ReqResClient.fetchUser(postUser.user_id)
-              _    <- UserPersistence.create(user).mapError(err => DatabaseError(err.getMessage))
+              _    <- UserPersistence.create(user)
             } yield ()
 
           override def getUser(userId: UserId): RIO[UserPersistence, User] =
             UserPersistence
               .retrieve(userId)
-              .mapError(err => DatabaseError(err.getMessage))
               .flatMap(maybeUser => Task.require(UserNotFound(userId))(Task.succeed(maybeUser)))
 
           override def deleteUser(userId: UserId): RIO[UserPersistence, Unit] =
             UserPersistence
               .delete(userId)
-              .mapError(err => DatabaseError(err.getMessage))
               .flatMap {
                 case true  => UIO.unit
                 case false => Task.fail(UserNotFound(userId))

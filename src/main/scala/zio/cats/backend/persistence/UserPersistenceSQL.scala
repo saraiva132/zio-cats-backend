@@ -4,8 +4,8 @@ import doobie.implicits._
 import doobie.refined.implicits._
 import doobie.util.transactor.Transactor
 import doobie.{Query0, Update0}
-
 import zio._
+import zio.cats.backend.data.Error.DatabaseError
 import zio.cats.backend.data.{User, UserId}
 import zio.cats.backend.persistence.UserPersistenceSQL.Queries
 import zio.cats.backend.system.dbtransactor.DBTransactor
@@ -21,13 +21,15 @@ final class UserPersistenceSQL(trx: Transactor[Task]) extends UserPersistence.Se
       .get(userId)
       .option
       .transact(trx)
+      .mapError(err => DatabaseError(err.getMessage))
 
   def create(user: User): Task[User] =
     Queries
       .create(user)
       .run
       .transact(trx)
-      .foldM(err => Task.fail(err), _ => Task.succeed(user))
+      .as(user)
+      .mapError(err => DatabaseError(err.getMessage))
 
   def delete(userId: UserId): Task[Boolean] =
     Queries
@@ -40,6 +42,7 @@ final class UserPersistenceSQL(trx: Transactor[Task]) extends UserPersistence.Se
     Queries.health.option
       .transact(trx)
       .fold(_ => false, _ => true)
+
 }
 
 object UserPersistenceSQL {

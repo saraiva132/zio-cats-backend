@@ -34,7 +34,39 @@ This service tries to follow the best coding practices and showcase as much as o
 * Containerization
 * Schema migration
 
-### Service
+### Service Architecture and code design
+
+I took quite an opinionated path towards architecting this service.
+
+The service is divided into 3 layers:
+
+* **Routes (Input / Output)**
+  * Routes are described as immutable values using ztapir. 
+  Each endpoint is described with an input, output, error, and its dependencies.
+  
+* **Business Services (Transformations)**
+  * A service in ZIO is called a module. Business services are modules that are typically specialized.
+    There is no need for abstracting here, so, for that reason, I chose to leak implementation details
+    and each method already defines its own dependencies in the method signature of the service.
+    i.e. `def getUser(userId: UserId): RIO[UserPersistence, User]` 
+    The advantage of this approach is its simplicity and how easy it is to wire dependencies.
+    
+* **Services that interact with the outside world (Output / Input)**
+  * Unlike business services. Services that interface with the outside world often require us
+  to switch implementations. For that reason, the service definition does not leak implementation details
+  so we leave that to the actual implementation, which can be described as a `final class` having its dependencies
+  passed as constructor parameters which will, in turn, be a dependency requirement of the layer.
+  i.e. `URLayer[Has[ReqResConfig] with SttpClient, ReqResClient]`
+  The advantage of this approach is that your service API does not leak implementation details and is more flexible.
+
+
+Disclaimer: Given the simplicity of the service. 
+Our client that interacts with the third-party service is under `services`. 
+I would normally put it under a package like `external` or `clients`.
+`Persistence` already implies outside world interaction and can be seen as a specialized client (db).
+
+
+### Commands
 
 To run the service or integration tests please make use of the script provided.
 
