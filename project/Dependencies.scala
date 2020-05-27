@@ -5,9 +5,9 @@ object Dependencies {
   private val testWithIt = "it, test"
 
   object ZIO {
-    val zioVersion     = "1.0.0-RC19-2"
-    val interopVersion = "2.0.0.0-RC14"
-    val loggingVersion = "0.2.9"
+    val zioVersion     = "1.0.0-RC20"
+    val interopVersion = "2.1.3.0-RC15"
+    val loggingVersion = "0.3.0"
 
     val zio          = "dev.zio" %% "zio"               % zioVersion
     val streams      = "dev.zio" %% "zio-streams"       % zioVersion
@@ -38,7 +38,7 @@ object Dependencies {
   }
 
   object Tapir {
-    private val version = "0.15.2"
+    private val version = "0.15.3"
 
     val core             = "com.softwaremill.sttp.tapir" %% "tapir-core"               % version
     val docs             = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs"       % version
@@ -56,7 +56,7 @@ object Dependencies {
 
   object STTP {
 
-    private val version = "2.1.4"
+    private val version = "2.1.5"
 
     val zioClient   = "com.softwaremill.sttp.client" %% "async-http-client-backend-zio" % version
     val clientCirce = "com.softwaremill.sttp.client" %% "circe"                         % version

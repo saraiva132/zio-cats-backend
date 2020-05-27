@@ -36,12 +36,15 @@ final class UserPersistenceSQL(trx: Transactor[Task]) extends UserPersistence.Se
       .delete(userId)
       .run
       .transact(trx)
-      .fold(_ => false, _ => true)
+      .bimap(
+        err => DatabaseError(err.getMessage),
+        rows => if (rows == 0) false else true
+      )
 
   def isHealthy: Task[Boolean] =
     Queries.health.option
       .transact(trx)
-      .fold(_ => false, _ => true)
+      .isSuccess
 
 }
 
