@@ -1,10 +1,11 @@
 package zio.cats.backend
 
 import doobie.util.query.Query0
-import zio.{Has, UIO, ZIO, ZLayer}
+import zio.{Has, Task, UIO, ZIO, ZLayer}
 import zio.cats.backend.system.dbtransactor.DBTransactor
 import zio.clock.Clock
 import doobie.implicits._
+import doobie.util.transactor.Transactor
 import zio.interop.catz._
 import zio.duration._
 
@@ -18,7 +19,7 @@ object BeforeAfter {
 
   private val acquire: ZIO[DBTransactor with Clock, Throwable, Unit] =
     for {
-      trx <- ZIO.access[DBTransactor](_.get)
+      trx <- ZIO.service[Transactor[Task]]
       _   <- clearTable.unique.transact(trx).delay(50.millis).eventually.timeout(1.seconds)
     } yield ()
 

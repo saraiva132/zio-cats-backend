@@ -7,7 +7,7 @@ import io.circe.{Decoder, Encoder}
 import zio.cats.backend.data.Error.EmailNotValid
 import zio.{IO, UIO}
 
-final case class Email private (value: String)
+final case class Email(value: String) extends AnyVal
 
 object Email {
 

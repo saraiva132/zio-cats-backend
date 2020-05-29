@@ -77,9 +77,9 @@ package object config {
         .tapError(logEnv)
     )
 
-    val httpServerConfig: URIO[Has[HttpServerConfig], HttpServerConfig] = ZIO.access(_.get)
-    val httpClientConfig: URIO[Has[HttpClientConfig], HttpClientConfig] = ZIO.access(_.get)
-    val dbConfig: URIO[Has[PostgresConfig], PostgresConfig]             = ZIO.access(_.get)
-    val reqResConfig: URIO[Has[ReqResConfig], ReqResConfig]             = ZIO.access(_.get)
+    val httpServerConfig: URIO[Has[HttpServerConfig], HttpServerConfig] = ZIO.service
+    val httpClientConfig: URIO[Has[HttpClientConfig], HttpClientConfig] = ZIO.service
+    val dbConfig: URIO[Has[PostgresConfig], PostgresConfig]             = ZIO.service
+    val reqResConfig: URIO[Has[ReqResConfig], ReqResConfig]             = ZIO.service
   }
 }

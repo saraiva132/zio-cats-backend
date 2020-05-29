@@ -9,8 +9,8 @@ import zio.clock.Clock
 import zio.duration._
 
 /**
- * Experimenting with using layers to create beforeAll/afterAll behaviour
- */
+  * Experimenting with using layers to create beforeAll/afterAll behaviour
+  */
 object BeforeAllAfterAll {
 
   type dummyService = Has[Unit]
@@ -19,7 +19,7 @@ object BeforeAllAfterAll {
 
   private val acquire: ZIO[SttpClient with Clock, Throwable, Unit] =
     for {
-      client <- ZIO.access[SttpClient](_.get)
+      client <- ZIO.service[SttpClientService]
       _      <- client.send(healthCheck).delay(100.millis).doUntil(_.code == StatusCode.Ok)
     } yield ()
 

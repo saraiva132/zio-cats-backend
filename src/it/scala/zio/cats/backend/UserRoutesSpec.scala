@@ -3,7 +3,7 @@ package zio.cats.backend
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client.asynchttpclient.zio.SttpClient
 import sttp.client.basicRequest
-import zio.{IO, ZIO}
+import zio.ZIO
 import zio.cats.backend.data.{Email, PostUser, User, UserId}
 import zio.test.{testM, _}
 import sttp.client._
@@ -32,17 +32,17 @@ object UserRoutesSpec extends DefaultRunnableSpec {
   val beforeAfterLayer = BeforeAfter.live.orDie
   val sharedTestsLayer = (Clock.live ++ transactorLayer ++ httpClientLayer ++ beforeAllAfterAllLayer).orDie
 
-  val postUser = basicRequest
-    .body(PostUser.Test)
-    .post(uri"$usersEndpoint")
+  def postUser(postUser: PostUser) =
+    basicRequest
+      .body(postUser)
+      .post(uri"$usersEndpoint")
 
   def getUser(id: UserId) =
     basicRequest
       .response(asJson[User])
       .get(uri"$usersEndpoint/${id.value}")
 
-  val deleteUser = basicRequest
-    .delete(uri"$usersEndpoint/${UserId.Test.value}")
+  def deleteUser(userId: UserId) = basicRequest.delete(uri"$usersEndpoint/${userId.value}")
 
   val expected = User(
     id = UserId(1),
@@ -53,48 +53,32 @@ object UserRoutesSpec extends DefaultRunnableSpec {
 
   def spec =
     suite("User routes")(
-      testM("allows creation of a new  user")(
-        for {
-          client <- ZIO.access[SttpClient](_.get)
-          _      <- client.send(postUser)
-          user <-
-            client
-              .send(getUser(UserId.Test))
-              .map(_.body.toOption.get)
-        } yield assert(user)(equalTo(expected))
-      ).provideSomeLayer[testDependencies](beforeAfterLayer),
-      testM("allows deletion of existing user")(
-        for {
-          client <- ZIO.access[SttpClient](_.get)
-          _      <- client.send(postUser)
-          user <-
-            client
-              .send(getUser(UserId.Test))
-              .map(_.body.toOption.get)
+      testM("creation of new user: success") {
+        val userToPost = PostUser.Test.copy(email = Email("george.bluth@reqres.in"))
 
-          _ <- client.send(deleteUser)
-          result <-
-            client
-              .send(getUser(UserId.Test))
-              .map(_.body)
-              .flatMap(IO.fromEither(_).mapError(_.body))
-              .flip
-        } yield assert(user)(equalTo(expected)) && assert(result)(equalTo("{\"message\":\"User with id 1 was not found!\"}"))
-      ).provideSomeLayer[testDependencies](beforeAfterLayer),
-      testM("returns not found if user is not registered")(
         for {
-          client <- ZIO.access[SttpClient](_.get)
-          result <-
-            client
-              .send(getUser(UserId(0)))
-              .map(_.body)
-              .flatMap(IO.fromEither(_).mapError(_.body))
-              .flip
-        } yield assert(result)(equalTo("{\"message\":\"User with id 0 was not found!\"}"))
-      ).provideSomeLayer[testDependencies](beforeAfterLayer),
-      testM("returns badRequest if post payload is not correct")(
+          client    <- ZIO.service[SttpClientService]
+          _         <- client.send(postUser(userToPost))
+          response  <- client.send(getUser(UserId.Test))
+          statusCode = response.code
+          result     = response.body.toOption.get
+        } yield assert(result)(equalTo(expected)) && assert(statusCode)(equalTo(StatusCode.Ok))
+
+      },
+      testM("creation of new user: bad email") {
+        val userToPost    = PostUser.Test.copy(email = Email("someOther@email"))
+        val expectedError = s"""{"message":"There is no user with email ${userToPost.email.value} for ${userToPost.user_id.value}."}"""
+
         for {
-          client <- ZIO.access[SttpClient](_.get)
+          client    <- ZIO.service[SttpClientService]
+          response  <- client.send(postUser(userToPost))
+          statusCode = response.code
+          message   <- ZIO.fromEither(response.body).flip
+        } yield assert(message)(equalTo(expectedError)) && assert(statusCode)(equalTo(StatusCode.NotFound))
+      },
+      testM("creation of new user: bad request")(
+        for {
+          client <- ZIO.service[SttpClientService]
           code <-
             client
               .send(
@@ -104,6 +88,33 @@ object UserRoutesSpec extends DefaultRunnableSpec {
               )
               .map(_.code)
         } yield assert(code)(equalTo(StatusCode.BadRequest))
-      ).provideSomeLayer[testDependencies](beforeAfterLayer)
-    ).provideCustomLayerShared(sharedTestsLayer)
+      ),
+      testM("creation of new user: userId not found") {
+        val expected = """{"message":"User with id 0 was not found!"}"""
+
+        for {
+          client    <- ZIO.service[SttpClientService]
+          response  <- client.send(getUser(UserId(0)))
+          statusCode = response.code
+          message   <- ZIO.fromEither(response.body).mapError(_.body).flip
+        } yield assert(message)(equalTo(expected)) && assert(statusCode)(equalTo(StatusCode.NotFound))
+      },
+      testM("deletion of existing user success") {
+        val userToPost    = PostUser.Test.copy(email = Email("george.bluth@reqres.in"))
+        val expectedError = """{"message":"User with id 1 was not found!"}"""
+
+        for {
+          client    <- ZIO.service[SttpClientService]
+          _         <- client.send(postUser(userToPost))
+          user      <- client.send(getUser(UserId.Test)).map(_.body.toOption.get)
+          _         <- client.send(deleteUser(UserId.Test))
+          response  <- client.send(getUser(UserId.Test))
+          statusCode = response.code
+          message   <- ZIO.fromEither(response.body).mapError(_.body).flip
+        } yield assert(user)(equalTo(expected)) &&
+          assert(message)(equalTo(expectedError)) &&
+          assert(statusCode)(equalTo(StatusCode.NotFound))
+      }
+    ).provideSomeLayer[testDependencies](beforeAfterLayer)
+      .provideCustomLayerShared(sharedTestsLayer)
 }

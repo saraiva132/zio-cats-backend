@@ -16,12 +16,12 @@ object Main extends App {
 
   val configLayer          = Logger.live >>> Config.live
   val transactorLayer      = Logger.live ++ Blocking.any ++ configLayer >>> DBTransactor.live
-  val httpCLient           = configLayer >>> Client.live
+  val httpClient           = configLayer >>> Client.live
   val userPersistenceLayer = transactorLayer >>> UserPersistenceSQL.live
-  val resreqClientLayer    = configLayer ++ httpCLient >>> ReqResClientHTTP.live
+  val resReqClientLayer    = configLayer ++ httpClient >>> ReqResClientHTTP.live
   val userManagerLayer     = UserService.live
 
-  val appLayers = Logger.live ++ configLayer ++ HealthCheck.live ++ userPersistenceLayer ++ resreqClientLayer ++ userManagerLayer
+  val appLayers = Logger.live ++ configLayer ++ HealthCheck.live ++ userPersistenceLayer ++ resReqClientLayer ++ userManagerLayer
 
   override def run(args: List[String]): ZIO[ZEnv, Nothing, ExitCode] =
     Server.runServer

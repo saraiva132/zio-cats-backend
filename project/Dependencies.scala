@@ -22,19 +22,11 @@ object Dependencies {
   object Cats {
     private val catsV       = "2.1.1"
     private val catsEffectV = "2.1.3"
-    private val catsMtlV    = "0.7.0"
 
-    val core          = "org.typelevel" %% "cats-core"        % catsV
-    val free          = "org.typelevel" %% "cats-free"        % catsV
-    val jvm           = "org.typelevel" %% "cats-jvm"         % catsV
-    val `kernel-laws` = "org.typelevel" %% "cats-kernel-laws" % catsV
-    val kernel        = "org.typelevel" %% "cats-kernel"      % catsV
-    val laws          = "org.typelevel" %% "cats-laws"        % catsV
-    val macros        = "org.typelevel" %% "cats-macros"      % catsV
-    val effect        = "org.typelevel" %% "cats-effect"      % catsEffectV
-    val mtl           = "org.typelevel" %% "cats-mtl-core"    % catsMtlV
+    val core   = "org.typelevel" %% "cats-core"   % catsV
+    val effect = "org.typelevel" %% "cats-effect" % catsEffectV
 
-    val all: Seq[ModuleID] = Seq(core, jvm, kernel, macros, effect)
+    val all: Seq[ModuleID] = Seq(core, effect)
   }
 
   object Tapir {
@@ -105,11 +97,9 @@ object Dependencies {
   object Streaming {
     private val version = "2.3.0"
 
-    val core     = "co.fs2" %% "fs2-core"             % version
-    val io       = "co.fs2" %% "fs2-io"               % version
-    val reactive = "co.fs2" %% "fs2-reactive-streams" % version
+    val core = "co.fs2" %% "fs2-core" % version
 
-    val all: Seq[ModuleID] = Seq(core, io, reactive)
+    val all: Seq[ModuleID] = Seq(core)
   }
 
   object Enum {
@@ -122,7 +112,7 @@ object Dependencies {
   }
 
   object Flyway {
-    val core   = "org.flywaydb"   % "flyway-core" % "6.4.2"
+    val core   = "org.flywaydb"   % "flyway-core" % "6.4.3"
     val driver = "org.postgresql" % "postgresql"  % "42.2.12"
 
     val all: Seq[ModuleID] = Seq(core, driver)

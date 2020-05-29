@@ -1,7 +1,8 @@
 package zio.cats.backend.services.reqres
 
 import zio.cats.backend.data.{User, UserId}
-import zio.{Has, RIO, Task}
+import zio.clock.Clock
+import zio.{Has, RIO}
 
 package object reqres {
 
@@ -10,10 +11,10 @@ package object reqres {
   object ReqResClient {
 
     trait Service {
-      def fetchUser(userId: UserId): Task[User]
+      def fetchUser(userId: UserId): RIO[Clock, User]
     }
 
-    def fetchUser(userId: UserId): RIO[ReqResClient, User] = RIO.accessM(_.get.fetchUser(userId))
+    def fetchUser(userId: UserId): RIO[ReqResClient with Clock, User] = RIO.accessM(_.get.fetchUser(userId))
   }
 
 }

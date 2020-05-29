@@ -11,9 +11,6 @@ import zio.cats.backend.persistence.UserPersistenceSQL.Queries
 import zio.cats.backend.system.dbtransactor.DBTransactor
 import zio.interop.catz._
 
-/**
-  * Persistence Module for production using Doobie
-  */
 final class UserPersistenceSQL(trx: Transactor[Task]) extends UserPersistence.Service {
 
   def retrieve(userId: UserId): Task[Option[User]] =
