@@ -14,14 +14,15 @@ import zio.{App, ExitCode, ZEnv, ZIO}
 
 object Main extends App {
 
-  val configLayer          = Logger.live >>> Config.live
-  val transactorLayer      = Logger.live ++ Blocking.any ++ configLayer >>> DBTransactor.live
-  val httpClient           = configLayer >>> Client.live
-  val userPersistenceLayer = transactorLayer >>> UserPersistenceSQL.live
-  val resReqClientLayer    = configLayer ++ httpClient >>> ReqResClientHTTP.live
-  val userManagerLayer     = UserService.live
+  val logger          = Logger.live
+  val config          = logger >>> Config.live
+  val transactor      = logger ++ Blocking.any ++ config >>> DBTransactor.live
+  val httpClient      = config >>> Client.live
+  val userPersistence = transactor >>> UserPersistenceSQL.live
+  val resReqClient    = config ++ httpClient >>> ReqResClientHTTP.live
+  val userManager     = UserService.live
 
-  val appLayers = Logger.live ++ configLayer ++ HealthCheck.live ++ userPersistenceLayer ++ resReqClientLayer ++ userManagerLayer
+  val appLayers = logger ++ config ++ HealthCheck.live ++ userPersistence ++ resReqClient ++ userManager
 
   override def run(args: List[String]): ZIO[ZEnv, Nothing, ExitCode] =
     Server.runServer

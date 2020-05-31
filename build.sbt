@@ -29,7 +29,7 @@ lazy val zioCatsBackend = project
 
 lazy val thisBuildSettings = inThisBuild(
   Seq(
-    scalaVersion := "2.13.1",
+    scalaVersion := "2.13.2",
     name := "zio-cats-backend",
     normalizedName := "zio-cats-backend",
     description := "A backend service integrating ZIO with cats, http4s, doobie and tapir",
@@ -73,7 +73,7 @@ lazy val plugins = Seq(
   compilerPlugin(scalafixSemanticdb)
 )
 
-ThisBuild / scalafixDependencies += "com.nequissimus" %% "sort-imports" % "0.3.1"
+ThisBuild / scalafixDependencies += "com.nequissimus" %% "sort-imports" % "0.5.0"
 
 packageName in Docker := "zio-cats-backend"
 version in Docker := "integration-test"

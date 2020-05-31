@@ -17,10 +17,5 @@ object Logger {
     logFormat.format(correlationId, message)
   }
 
-  val test: URLayer[Console with Clock, Logging] = Logging.console { (context, message) =>
-    val correlationId = LogAnnotation.CorrelationId.render(
-      context.get(LogAnnotation.CorrelationId)
-    )
-    logFormat.format(correlationId, message)
-  }
+  val test: URLayer[Console with Clock, Logging] = Logging.console()
 }

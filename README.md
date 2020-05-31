@@ -49,7 +49,8 @@ The service is divided into 3 layers:
     There is no need for abstracting here, so, for that reason, I chose to leak implementation details
     and each method already defines its own dependencies in the method signature of the service.
     i.e. `def getUser(userId: UserId): RIO[UserPersistence, User]` 
-    The advantage of this approach is its simplicity and how easy it is to wire dependencies.
+    The advantage of this approach is its simplicity and how easy it is to wire dependencies. 
+    The disadvantage is that it leads to methods having huge type signatures which forces us to carefully choose type aliases.
     
 * **Services that interact with the outside world (Output / Input)**
   * Unlike business services. Services that interface with the outside world often require us
@@ -65,6 +66,9 @@ Our client that interacts with the third-party service is under `services`.
 I would normally put it under a package like `external` or `clients`.
 `Persistence` already implies outside world interaction and can be seen as a specialized client (db).
 
+Final note: From what I have seen so far. The most common and popular approach is to **not leak implementation details** 
+and therefore use the second approach described. This will make the dependency graph more clear when wiring dependencies 
+instead of basically passing all the services into a single effect that depends on everything.
 
 ### Commands
 

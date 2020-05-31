@@ -1,6 +1,7 @@
 package zio.cats.backend
 
 import cats.implicits._
+
 import zio.ULayer
 import zio.cats.backend.data.Error.{DatabaseError, EmailDoesNotMatch, ErrorFetchingUser, UserNotFound}
 import zio.cats.backend.data.{Email, PostUser, User, UserId}

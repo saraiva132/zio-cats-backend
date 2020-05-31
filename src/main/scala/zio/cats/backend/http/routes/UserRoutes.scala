@@ -1,12 +1,14 @@
 package zio.cats.backend.http.routes
 
 import cats.implicits._
+
 import org.http4s.HttpRoutes
 import sttp.model.StatusCode
 import sttp.tapir.docs.openapi._
 import sttp.tapir.json.circe._
 import sttp.tapir.server.http4s.ztapir._
 import sttp.tapir.ztapir.{ZEndpoint, endpoint, statusMapping, _}
+
 import zio.cats.backend.UserServiceEnv
 import zio.cats.backend.data._
 import zio.cats.backend.http.ClientError

@@ -6,6 +6,7 @@ import sttp.client._
 import sttp.client.asynchttpclient.zio.SttpClient
 import sttp.client.circe._
 import sttp.model.{StatusCode, Uri}
+
 import zio._
 import zio.cats.backend.SttpClientService
 import zio.cats.backend.data.Error.{ErrorFetchingUser, RequestTimedOut, UserNotFound}

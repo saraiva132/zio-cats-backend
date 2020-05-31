@@ -4,6 +4,7 @@ import doobie.implicits._
 import doobie.refined.implicits._
 import doobie.util.transactor.Transactor
 import doobie.{Query0, Update0}
+
 import zio._
 import zio.cats.backend.data.Error.DatabaseError
 import zio.cats.backend.data.{User, UserId}
@@ -25,8 +26,7 @@ final class UserPersistenceSQL(trx: Transactor[Task]) extends UserPersistence.Se
       .create(user)
       .run
       .transact(trx)
-      .as(user)
-      .mapError(err => DatabaseError(err.getMessage))
+      .bimap(err => DatabaseError(err.getMessage), _ => user)
 
   def delete(userId: UserId): Task[Boolean] =
     Queries

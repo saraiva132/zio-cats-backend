@@ -15,15 +15,16 @@ import zio.cats.backend.system.logging.Logger
 object UserPersistenceQueriesSpec extends DefaultRunnableSpec with QueryChecker {
 
   /**
-   * Hack to get doobie query check to work with ZIO
-   */
+    * Hack to get doobie query check to work with ZIO
+    */
   val runtime    = Runtime.default //Use test runtime
   val releaseMap = runtime.unsafeRun(ReleaseMap.make)
 
-  val configLayer = Logger.test >>> Config.live ++ Blocking.live
-  val finalLayer  = (configLayer ++ Logger.test).map(cfg => (cfg, releaseMap))
+  val logger      = Logger.test
+  val configLayer = logger >>> Config.live
+  val testLayers  = (configLayer ++ Blocking.live ++ logger).map(cfg => (cfg, releaseMap))
 
-  val transactorF             = DBTransactor.managed.zio.provideLayer(finalLayer)
+  val transactorF             = DBTransactor.managed.zio.provideLayer(testLayers)
   val (finalizer, transactor) = runtime.unsafeRun(transactorF)
 
   def spec =
