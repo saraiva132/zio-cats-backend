@@ -7,7 +7,7 @@ object Dependencies {
   object ZIO {
     val zioVersion     = "1.0.0-RC20"
     val interopVersion = "2.1.3.0-RC15"
-    val loggingVersion = "0.3.0"
+    val loggingVersion = "0.3.1"
 
     val zio          = "dev.zio" %% "zio"               % zioVersion
     val streams      = "dev.zio" %% "zio-streams"       % zioVersion
@@ -30,7 +30,7 @@ object Dependencies {
   }
 
   object Tapir {
-    private val version = "0.15.3"
+    private val version = "0.15.4"
 
     val core             = "com.softwaremill.sttp.tapir" %% "tapir-core"               % version
     val docs             = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs"       % version
@@ -48,7 +48,7 @@ object Dependencies {
 
   object STTP {
 
-    private val version = "2.1.5"
+    private val version = "2.2.0"
 
     val zioClient   = "com.softwaremill.sttp.client" %% "async-http-client-backend-zio" % version
     val clientCirce = "com.softwaremill.sttp.client" %% "circe"                         % version
@@ -112,8 +112,8 @@ object Dependencies {
   }
 
   object Flyway {
-    val core   = "org.flywaydb"   % "flyway-core" % "6.4.3"
-    val driver = "org.postgresql" % "postgresql"  % "42.2.12"
+    val core   = "org.flywaydb"   % "flyway-core" % "6.4.4"
+    val driver = "org.postgresql" % "postgresql"  % "42.2.14"
 
     val all: Seq[ModuleID] = Seq(core, driver)
   }
