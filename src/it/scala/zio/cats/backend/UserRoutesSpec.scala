@@ -3,7 +3,7 @@ package zio.cats.backend
 import eu.timepit.refined.types.string.NonEmptyString
 import sttp.client.asynchttpclient.zio.SttpClient
 import sttp.client.basicRequest
-import zio.ZIO
+import zio.{IO, ZIO}
 import zio.cats.backend.data.{Email, PostUser, User, UserId}
 import zio.test.{testM, _}
 import sttp.client._
@@ -18,6 +18,7 @@ import zio.test.Assertion._
 import TestData._
 import zio.blocking.Blocking
 import zio.cats.backend.system.dbtransactor.DBTransactor
+import io.circe.Error
 
 object UserRoutesSpec extends DefaultRunnableSpec {
 
@@ -31,18 +32,6 @@ object UserRoutesSpec extends DefaultRunnableSpec {
 
   val beforeAfterLayer = BeforeAfter.live.orDie
   val sharedTestsLayer = (Clock.live ++ transactorLayer ++ httpClientLayer ++ beforeAllAfterAllLayer).orDie
-
-  def postUser(postUser: PostUser) =
-    basicRequest
-      .body(postUser)
-      .post(uri"$usersEndpoint")
-
-  def getUser(id: UserId) =
-    basicRequest
-      .response(asJson[User])
-      .get(uri"$usersEndpoint/${id.value}")
-
-  def deleteUser(userId: UserId) = basicRequest.delete(uri"$usersEndpoint/${userId.value}")
 
   val expected = User(
     id = UserId(1),
@@ -96,7 +85,7 @@ object UserRoutesSpec extends DefaultRunnableSpec {
           client    <- ZIO.service[SttpClientService]
           response  <- client.send(getUser(UserId(0)))
           statusCode = response.code
-          message   <- ZIO.fromEither(response.body).mapError(_.body).flip
+          message   <- extractResponseErrorMessage(response)
         } yield assert(message)(equalTo(expected)) && assert(statusCode)(equalTo(StatusCode.NotFound))
       },
       testM("deletion of existing user success") {
@@ -110,11 +99,33 @@ object UserRoutesSpec extends DefaultRunnableSpec {
           _         <- client.send(deleteUser(UserId.Test))
           response  <- client.send(getUser(UserId.Test))
           statusCode = response.code
-          message   <- ZIO.fromEither(response.body).mapError(_.body).flip
+          message   <- extractResponseErrorMessage(response)
         } yield assert(user)(equalTo(expected)) &&
           assert(message)(equalTo(expectedError)) &&
           assert(statusCode)(equalTo(StatusCode.NotFound))
       }
     ).provideSomeLayer[testDependencies](beforeAfterLayer)
       .provideCustomLayerShared(sharedTestsLayer)
+
+  def extractResponseErrorMessage[A](response: Response[Either[ResponseError[Error], A]]): IO[A, String] =
+    ZIO
+      .fromEither(response.body)
+      .mapError {
+        case HttpError(body, _) => body
+        case _                  => ""
+      }
+      .flip
+
+  def postUser(postUser: PostUser) =
+    basicRequest
+      .body(postUser)
+      .post(uri"$usersEndpoint")
+
+  def getUser(id: UserId) =
+    basicRequest
+      .response(asJson[User])
+      .get(uri"$usersEndpoint/${id.value}")
+
+  def deleteUser(userId: UserId) = basicRequest.delete(uri"$usersEndpoint/${userId.value}")
+
 }

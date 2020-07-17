@@ -3,7 +3,6 @@ package zio.cats.backend.testkit
 import scala.reflect.runtime.universe.TypeTag
 
 import cats.effect.Effect
-import cats.effect._
 
 import doobie.implicits._
 import doobie.util.query.{Query, Query0}

@@ -29,7 +29,7 @@ lazy val zioCatsBackend = project
 
 lazy val thisBuildSettings = inThisBuild(
   Seq(
-    scalaVersion := "2.13.2",
+    scalaVersion := "2.13.3",
     name := "zio-cats-backend",
     normalizedName := "zio-cats-backend",
     description := "A backend service integrating ZIO with cats, http4s, doobie and tapir",
@@ -68,7 +68,7 @@ lazy val dependencies =
 
 lazy val plugins = Seq(
   compilerPlugin("org.typelevel" %% "kind-projector"     % "0.11.0" cross CrossVersion.full),
-  compilerPlugin("io.tryp"        % "splain"             % "0.5.6" cross CrossVersion.patch),
+  compilerPlugin("io.tryp"        % "splain"             % "0.5.7" cross CrossVersion.patch),
   compilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1"),
   compilerPlugin(scalafixSemanticdb)
 )

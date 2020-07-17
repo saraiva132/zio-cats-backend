@@ -5,9 +5,9 @@ object Dependencies {
   private val testWithIt = "it, test"
 
   object ZIO {
-    val zioVersion     = "1.0.0-RC20"
-    val interopVersion = "2.1.3.0-RC15"
-    val loggingVersion = "0.3.1"
+    val zioVersion     = "1.0.0-RC21-2"
+    val interopVersion = "2.1.4.0-RC17"
+    val loggingVersion = "0.3.2"
 
     val zio          = "dev.zio" %% "zio"               % zioVersion
     val streams      = "dev.zio" %% "zio-streams"       % zioVersion
@@ -21,7 +21,7 @@ object Dependencies {
 
   object Cats {
     private val catsV       = "2.1.1"
-    private val catsEffectV = "2.1.3"
+    private val catsEffectV = "2.1.4"
 
     val core   = "org.typelevel" %% "cats-core"   % catsV
     val effect = "org.typelevel" %% "cats-effect" % catsEffectV
@@ -30,7 +30,7 @@ object Dependencies {
   }
 
   object Tapir {
-    private val version = "0.15.4"
+    private val version = "0.16.4"
 
     val core             = "com.softwaremill.sttp.tapir" %% "tapir-core"               % version
     val docs             = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs"       % version
@@ -48,7 +48,7 @@ object Dependencies {
 
   object STTP {
 
-    private val version = "2.2.0"
+    private val version = "2.2.2"
 
     val zioClient   = "com.softwaremill.sttp.client" %% "async-http-client-backend-zio" % version
     val clientCirce = "com.softwaremill.sttp.client" %% "circe"                         % version
@@ -57,8 +57,8 @@ object Dependencies {
   }
 
   object Http4s {
-    private val version          = "0.21.4"
-    private val prometheusHtt4sV = "0.4.0"
+    private val version          = "0.21.6"
+    private val prometheusHtt4sV = "0.4.1"
 
     val server          = "org.http4s"        %% "http4s-blaze-server"       % version
     val dsl             = "org.http4s"        %% "http4s-dsl"                % version
@@ -95,7 +95,7 @@ object Dependencies {
   }
 
   object Streaming {
-    private val version = "2.3.0"
+    private val version = "2.4.2"
 
     val core = "co.fs2" %% "fs2-core" % version
 
@@ -112,15 +112,15 @@ object Dependencies {
   }
 
   object Flyway {
-    val core   = "org.flywaydb"   % "flyway-core" % "6.4.4"
+    val core   = "org.flywaydb"   % "flyway-core" % "6.5.1"
     val driver = "org.postgresql" % "postgresql"  % "42.2.14"
 
     val all: Seq[ModuleID] = Seq(core, driver)
   }
 
   object Config {
-    private val version  = "0.12.3"
-    private val refinedV = "0.9.14"
+    private val version  = "0.13.0"
+    private val refinedV = "0.9.15"
 
     val pureconfig        = "com.github.pureconfig" %% "pureconfig"         % version
     val pureconfigRefined = "eu.timepit"            %% "refined-pureconfig" % refinedV

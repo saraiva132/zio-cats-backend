@@ -11,6 +11,7 @@ import zio.cats.backend.data.{User, UserId}
 import zio.cats.backend.persistence.UserPersistenceSQL.Queries
 import zio.cats.backend.system.config.Config
 import zio.cats.backend.system.logging.Logger
+import zio.duration._
 
 object UserPersistenceQueriesSpec extends DefaultRunnableSpec with QueryChecker {
 
@@ -32,6 +33,6 @@ object UserPersistenceQueriesSpec extends DefaultRunnableSpec with QueryChecker 
       testM("Check get query")(check(Queries.get(UserId.Test))),
       testM("Check create query")(check(Queries.create(User.Test))),
       testM("Check delete query")(check(Queries.delete(UserId.Test)))
-    ) @@ after(finalizer(Exit.unit))
+    ) @@ after(finalizer(Exit.unit)) @@ timeout(15 seconds)
 
 }
