@@ -1,9 +1,12 @@
 package zio.cats.backend.system
 
 import scala.concurrent.ExecutionContext
+
 import cats.effect.Blocker
+
 import doobie.hikari.HikariTransactor
 import doobie.util.transactor.Transactor
+
 import zio.blocking.Blocking
 import zio.cats.backend.system.config.{Config, PostgresConfig}
 import zio.interop.catz._
