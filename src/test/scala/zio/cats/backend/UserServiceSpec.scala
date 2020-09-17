@@ -1,6 +1,6 @@
 package zio.cats.backend
 
-import cats.implicits._
+import cats.syntax.all._
 
 import zio.ULayer
 import zio.cats.backend.data.Error.{DatabaseError, EmailDoesNotMatch, ErrorFetchingUser, UserNotFound}
@@ -18,6 +18,7 @@ object UserServiceSpec extends DefaultRunnableSpec {
   def spec =
     suite("User Service")(
       testM("create user success") {
+
         val mocks: ULayer[UserPersistence with ReqResClient] =
           ReqResClientMock.FetchUser(equalTo(UserId.Test), value(User.Test)) ++
               UserPersistenceMock.Create(equalTo(User.Test), value(User.Test))

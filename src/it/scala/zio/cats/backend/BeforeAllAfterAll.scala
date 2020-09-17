@@ -20,7 +20,7 @@ object BeforeAllAfterAll {
   private val acquire: ZIO[SttpClient with Clock, Throwable, Unit] =
     for {
       client <- ZIO.service[SttpClientService]
-      _      <- client.send(healthCheck).delay(100.millis).doUntil(_.code == StatusCode.Ok)
+      _      <- client.send(healthCheck).delay(100.millis).repeatUntil(_.code == StatusCode.Ok)
     } yield ()
 
   val live: ZLayer[SttpClient with Clock, Throwable, dummyService] =

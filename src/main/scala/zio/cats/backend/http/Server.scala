@@ -1,6 +1,6 @@
 package zio.cats.backend.http
 
-import cats.implicits._
+import cats.syntax.all._
 
 import org.http4s.HttpApp
 import org.http4s.implicits._

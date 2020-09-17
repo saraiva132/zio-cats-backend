@@ -1,6 +1,6 @@
 package zio.cats.backend.http.routes
 
-import cats.implicits._
+import cats.syntax.all._
 
 import org.http4s.HttpRoutes
 import sttp.tapir.json.circe._

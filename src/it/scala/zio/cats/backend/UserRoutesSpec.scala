@@ -5,7 +5,7 @@ import sttp.client.asynchttpclient.zio.SttpClient
 import sttp.client.basicRequest
 import zio.{IO, ZIO}
 import zio.cats.backend.data.{Email, PostUser, User, UserId}
-import zio.test.{testM, _}
+import zio.test._
 import sttp.client._
 import sttp.client.circe._
 import sttp.model.StatusCode
@@ -26,7 +26,7 @@ object UserRoutesSpec extends DefaultRunnableSpec {
 
   val loggerLayer            = Clock.live ++ Console.live >>> Logger.test
   val configLayer            = loggerLayer >>> Config.live
-  val transactorLayer        = configLayer ++ Blocking.live >>> DBTransactor.test
+  val transactorLayer        = configLayer ++ Blocking.live ++ loggerLayer >>> DBTransactor.test
   val httpClientLayer        = configLayer >>> Client.live
   val beforeAllAfterAllLayer = Clock.live ++ httpClientLayer >>> BeforeAllAfterAll.live
 

@@ -43,7 +43,6 @@ import zio.{Task, _}
   *          config.loadConfig.map(_.dbConfig)
   *        }
   *      }
-  *
   */
 package object config {
 
@@ -74,7 +73,7 @@ package object config {
       Task
         .effect(source.loadOrThrow[Configuration])
         .map(c => Has(c.httpServer) ++ Has(c.httpClient) ++ Has(c.dbConfig) ++ Has(c.reqResClient))
-        .tapError(logEnv)
+        .tapBoth(err => logEnv(err), c => log.info(s"Loaded configuration $c successfully."))
     )
 
     val httpServerConfig: URIO[Has[HttpServerConfig], HttpServerConfig] = ZIO.service
